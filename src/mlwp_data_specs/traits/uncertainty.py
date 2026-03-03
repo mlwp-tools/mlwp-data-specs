@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import textwrap
 
+import xarray as xr
+
 from mlwp_data_specs.checks.metadata.coords import check_uncertainty_coordinate_metadata
 from mlwp_data_specs.checks.traits.structure import check_uncertainty_trait_structure
 from mlwp_data_specs.traits.properties import Uncertainty
@@ -13,8 +15,22 @@ VERSION = "0.1.0"
 IDENTIFIER = "uncertainty"
 
 
-def validate_dataset(ds, *, trait: Uncertainty) -> tuple[ValidationReport, str]:
-    """Validate dataset against uncertainty trait requirements."""
+def validate_dataset(ds: xr.Dataset | None, *, trait: Uncertainty) -> tuple[ValidationReport, str]:
+    """Validate a dataset against the selected uncertainty trait specification.
+
+    Parameters
+    ----------
+    ds : xr.Dataset | None
+        Dataset to validate. ``None`` is only supported when checks are disabled
+        (e.g. docs rendering mode via ``skip_all_checks``).
+    trait : Uncertainty
+        Selected uncertainty trait profile.
+
+    Returns
+    -------
+    tuple[ValidationReport, str]
+        Validation report and inline markdown specification text.
+    """
     report = ValidationReport()
     spec_text = f"""
     ---

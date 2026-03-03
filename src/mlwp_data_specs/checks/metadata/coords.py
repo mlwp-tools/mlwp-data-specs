@@ -4,23 +4,57 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 
+import xarray as xr
+
 from mlwp_data_specs.traits.properties import Space, Time, Uncertainty
 from mlwp_data_specs.traits.reporting import ValidationReport, log_function_call
 
 
 def _fmt_required(expected: Iterable[str]) -> str:
+    """Format expected attribute values for report messages.
+
+    Parameters
+    ----------
+    expected : Iterable[str]
+        Expected values.
+
+    Returns
+    -------
+    str
+        Comma-separated value list.
+    """
     return ", ".join(sorted(expected))
 
 
 @log_function_call
 def check_coordinate_attrs(
-    ds,
+    ds: xr.Dataset,
     *,
     section: str,
     requirement: str,
     coord: str,
     required_attrs: dict[str, set[str]],
 ) -> ValidationReport:
+    """Validate required attributes for one coordinate.
+
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Dataset being validated.
+    section : str
+        Report section label.
+    requirement : str
+        Requirement text associated with this check.
+    coord : str
+        Coordinate name to validate.
+    required_attrs : dict[str, set[str]]
+        Mapping of attribute names to allowed values.
+
+    Returns
+    -------
+    ValidationReport
+        Report with a PASS/FAIL result for the coordinate.
+    """
     report = ValidationReport()
 
     if coord not in ds.coords:
@@ -47,7 +81,21 @@ def check_coordinate_attrs(
 
 
 @log_function_call
-def check_space_coordinate_metadata(ds, *, trait: Space) -> ValidationReport:
+def check_space_coordinate_metadata(ds: xr.Dataset, *, trait: Space) -> ValidationReport:
+    """Validate coordinate metadata for the selected space trait.
+
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Dataset being validated.
+    trait : Space
+        Selected space profile.
+
+    Returns
+    -------
+    ValidationReport
+        Combined report for all relevant spatial coordinates.
+    """
     report = ValidationReport()
     section = "Spatial Coordinate"
 
@@ -90,7 +138,21 @@ def check_space_coordinate_metadata(ds, *, trait: Space) -> ValidationReport:
 
 
 @log_function_call
-def check_time_coordinate_metadata(ds, *, trait: Time) -> ValidationReport:
+def check_time_coordinate_metadata(ds: xr.Dataset, *, trait: Time) -> ValidationReport:
+    """Validate coordinate metadata for the selected time trait.
+
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Dataset being validated.
+    trait : Time
+        Selected time profile.
+
+    Returns
+    -------
+    ValidationReport
+        Combined report for all required time coordinates.
+    """
     report = ValidationReport()
     section = "Time Coordinate"
 
@@ -134,7 +196,25 @@ def check_time_coordinate_metadata(ds, *, trait: Time) -> ValidationReport:
 
 
 @log_function_call
-def check_uncertainty_coordinate_metadata(ds, *, trait: Uncertainty) -> ValidationReport:
+def check_uncertainty_coordinate_metadata(
+    ds: xr.Dataset,
+    *,
+    trait: Uncertainty,
+) -> ValidationReport:
+    """Validate coordinate metadata for the selected uncertainty trait.
+
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Dataset being validated.
+    trait : Uncertainty
+        Selected uncertainty profile.
+
+    Returns
+    -------
+    ValidationReport
+        Report for uncertainty coordinate metadata and bounds checks.
+    """
     report = ValidationReport()
     section = "Uncertainty"
 

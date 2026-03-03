@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import textwrap
 
+import xarray as xr
+
 from mlwp_data_specs.checks.metadata.coords import check_space_coordinate_metadata
 from mlwp_data_specs.checks.traits.structure import check_space_trait_structure
 from mlwp_data_specs.traits.properties import Space
@@ -13,8 +15,22 @@ VERSION = "0.1.0"
 IDENTIFIER = "spatial_coordinate"
 
 
-def validate_dataset(ds, *, trait: Space) -> tuple[ValidationReport, str]:
-    """Validate dataset against spatial-coordinate trait requirements."""
+def validate_dataset(ds: xr.Dataset | None, *, trait: Space) -> tuple[ValidationReport, str]:
+    """Validate a dataset against the selected space trait specification.
+
+    Parameters
+    ----------
+    ds : xr.Dataset | None
+        Dataset to validate. ``None`` is only supported when checks are disabled
+        (e.g. docs rendering mode via ``skip_all_checks``).
+    trait : Space
+        Selected space trait profile.
+
+    Returns
+    -------
+    tuple[ValidationReport, str]
+        Validation report and inline markdown specification text.
+    """
     report = ValidationReport()
     spec_text = f"""
     ---

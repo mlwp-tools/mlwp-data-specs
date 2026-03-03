@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import argparse
 from collections.abc import Sequence
+from enum import Enum
+from typing import TypeVar
 
 import xarray as xr
 from loguru import logger
@@ -15,12 +17,33 @@ from mlwp_data_specs.traits.spatial_coordinate import validate_dataset as valida
 from mlwp_data_specs.traits.time_coordinate import validate_dataset as validate_time
 from mlwp_data_specs.traits.uncertainty import validate_dataset as validate_uncertainty
 
+EnumType = TypeVar("EnumType", bound=Enum)
 
-def _choice_values(enum_cls) -> list[str]:
+
+def _choice_values(enum_cls: type[EnumType]) -> list[str]:
+    """List sorted enum values for CLI `choices`.
+
+    Parameters
+    ----------
+    enum_cls : type[Enum]
+        Enum class with string values.
+
+    Returns
+    -------
+    list[str]
+        Sorted enum values.
+    """
     return sorted(item.value for item in enum_cls)
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """Build the CLI argument parser.
+
+    Returns
+    -------
+    argparse.ArgumentParser
+        Configured parser for trait validation commands.
+    """
     parser = argparse.ArgumentParser(
         description=(
             "Validate a dataset against selected trait specs. "
@@ -57,12 +80,46 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _print_list(title: str, values: list[str]) -> None:
+    """Print a titled list of supported trait values.
+
+    Parameters
+    ----------
+    title : str
+        Section title.
+    values : list[str]
+        Values to print.
+    """
     print(title)
     for value in values:
         print(f"  - {value}")
 
 
-def _run_selected_validations(ds, *, space: Space | None, time: Time | None, uncertainty: Uncertainty | None):
+def _run_selected_validations(
+    ds: xr.Dataset | None,
+    *,
+    space: Space | None,
+    time: Time | None,
+    uncertainty: Uncertainty | None,
+) -> tuple[ValidationReport, list[str]]:
+    """Run validations for all selected traits.
+
+    Parameters
+    ----------
+    ds : xr.Dataset | None
+        Dataset to validate. May be ``None`` when checks are patched out in
+        markdown rendering mode.
+    space : Space | None
+        Selected space profile.
+    time : Time | None
+        Selected time profile.
+    uncertainty : Uncertainty | None
+        Selected uncertainty profile.
+
+    Returns
+    -------
+    tuple[ValidationReport, list[str]]
+        Combined validation report and list of rendered trait markdown specs.
+    """
     report = ValidationReport()
     spec_texts: list[str] = []
 
@@ -86,6 +143,18 @@ def _run_selected_validations(ds, *, space: Space | None, time: Time | None, unc
 
 @logger.catch
 def main(argv: Sequence[str] | None = None) -> int:
+    """Run trait validation from CLI arguments.
+
+    Parameters
+    ----------
+    argv : Sequence[str] | None, optional
+        Optional argument sequence. Defaults to ``sys.argv`` when omitted.
+
+    Returns
+    -------
+    int
+        Process exit code (``0`` on pass/warn, ``1`` on fail).
+    """
     parser = build_parser()
     args = parser.parse_args(argv)
 

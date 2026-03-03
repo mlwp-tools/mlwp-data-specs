@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import xarray as xr
+
 from mlwp_data_specs.traits.properties import Space, Time, Uncertainty
 from mlwp_data_specs.traits.reporting import ValidationReport, log_function_call
 from mlwp_data_specs.traits.specs import SPACE_SPECS, TIME_SPECS, UNCERTAINTY_SPECS
@@ -15,7 +17,28 @@ SECTION_MAP = {
 
 
 @log_function_call
-def check_dim_variants(ds, *, axis: str, variants: list[set[str]]) -> ValidationReport:
+def check_dim_variants(
+    ds: xr.Dataset,
+    *,
+    axis: str,
+    variants: list[set[str]],
+) -> ValidationReport:
+    """Validate that dataset dimensions match one allowed variant.
+
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Dataset being validated.
+    axis : str
+        Trait axis key (``space``, ``time``, ``uncertainty``).
+    variants : list[set[str]]
+        Allowed dimension sets for the selected trait profile.
+
+    Returns
+    -------
+    ValidationReport
+        Report containing one PASS or FAIL result.
+    """
     report = ValidationReport()
     requirement = "Allowed dimension variants"
 
@@ -44,7 +67,28 @@ def check_dim_variants(ds, *, axis: str, variants: list[set[str]]) -> Validation
 
 
 @log_function_call
-def check_required_coords(ds, *, axis: str, required_coords: set[str]) -> ValidationReport:
+def check_required_coords(
+    ds: xr.Dataset,
+    *,
+    axis: str,
+    required_coords: set[str],
+) -> ValidationReport:
+    """Validate that required coordinates exist in the dataset.
+
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Dataset being validated.
+    axis : str
+        Trait axis key (``space``, ``time``, ``uncertainty``).
+    required_coords : set[str]
+        Required coordinate names for the trait profile.
+
+    Returns
+    -------
+    ValidationReport
+        Report containing one PASS or FAIL result.
+    """
     report = ValidationReport()
     requirement = "Required coordinates are present"
 
@@ -71,7 +115,21 @@ def check_required_coords(ds, *, axis: str, required_coords: set[str]) -> Valida
 
 
 @log_function_call
-def check_space_trait_structure(ds, *, trait: Space) -> ValidationReport:
+def check_space_trait_structure(ds: xr.Dataset, *, trait: Space) -> ValidationReport:
+    """Run structural checks for the selected space trait.
+
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Dataset being validated.
+    trait : Space
+        Selected space profile.
+
+    Returns
+    -------
+    ValidationReport
+        Combined report for space dimension and coordinate checks.
+    """
     spec = SPACE_SPECS[trait]
     report = ValidationReport()
     report += check_dim_variants(ds, axis="space", variants=spec.dim_variants)
@@ -80,7 +138,21 @@ def check_space_trait_structure(ds, *, trait: Space) -> ValidationReport:
 
 
 @log_function_call
-def check_time_trait_structure(ds, *, trait: Time) -> ValidationReport:
+def check_time_trait_structure(ds: xr.Dataset, *, trait: Time) -> ValidationReport:
+    """Run structural checks for the selected time trait.
+
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Dataset being validated.
+    trait : Time
+        Selected time profile.
+
+    Returns
+    -------
+    ValidationReport
+        Combined report for time dimension and coordinate checks.
+    """
     spec = TIME_SPECS[trait]
     report = ValidationReport()
     report += check_dim_variants(ds, axis="time", variants=spec.dim_variants)
@@ -89,7 +161,25 @@ def check_time_trait_structure(ds, *, trait: Time) -> ValidationReport:
 
 
 @log_function_call
-def check_uncertainty_trait_structure(ds, *, trait: Uncertainty) -> ValidationReport:
+def check_uncertainty_trait_structure(
+    ds: xr.Dataset,
+    *,
+    trait: Uncertainty,
+) -> ValidationReport:
+    """Run structural checks for the selected uncertainty trait.
+
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Dataset being validated.
+    trait : Uncertainty
+        Selected uncertainty profile.
+
+    Returns
+    -------
+    ValidationReport
+        Combined report for uncertainty dimension and coordinate checks.
+    """
     spec = UNCERTAINTY_SPECS[trait]
     report = ValidationReport()
     report += check_dim_variants(ds, axis="uncertainty", variants=spec.dim_variants)

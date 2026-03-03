@@ -18,6 +18,13 @@ TRAITS_DIR = DOCS_DIR / "traits"
 
 
 def _render_specs() -> dict[str, str]:
+    """Render markdown specs for all trait/profile combinations.
+
+    Returns
+    -------
+    dict[str, str]
+        Mapping of output page name to markdown content.
+    """
     pages: dict[str, str] = {}
 
     with skip_all_checks():
@@ -35,6 +42,13 @@ def _render_specs() -> dict[str, str]:
 
 
 def _write_index(page_names: list[str]) -> None:
+    """Write the docs index page linking all generated trait pages.
+
+    Parameters
+    ----------
+    page_names : list[str]
+        Generated page base names (without extension).
+    """
     lines = [
         "# MLWP Trait Specifications",
         "",
@@ -50,6 +64,7 @@ def _write_index(page_names: list[str]) -> None:
 
 
 def main() -> None:
+    """Generate all trait markdown docs under ``docs/traits``."""
     TRAITS_DIR.mkdir(parents=True, exist_ok=True)
     pages = _render_specs()
 

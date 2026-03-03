@@ -9,6 +9,8 @@ from .properties import Space, Time, Uncertainty
 
 @dataclass
 class PropertySpec:
+    """Structural requirements for a trait profile."""
+
     dim_variants: list[set[str]] = field(default_factory=list)
     required_coords: set[str] = field(default_factory=set)
     optional_dims: set[str] = field(default_factory=set)
