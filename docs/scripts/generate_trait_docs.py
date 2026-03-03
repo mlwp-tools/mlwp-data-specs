@@ -86,8 +86,8 @@ def _write_index(page_names: list[str]) -> None:
         "",
         "Both interfaces are expected:",
         "",
-        "1. Python API via `check_dataset(ds, time=..., space=..., uncertainty=...)`.",
-        "2. CLI via `mlwp.validate_trait` for local/remote validation and CI usage.",
+        "1. Python API via `validate_dataset(ds, time=..., space=..., uncertainty=...)`.",
+        "2. CLI via `mlwp.validate_dataset_traits` for local/remote validation and CI usage.",
         "",
         "## Specs",
         "",
@@ -174,18 +174,18 @@ def _usage_block_for_page(page_name: str) -> str:
     return (
         "Run with `uvx` from release on [pypi.org](https://pypi.org/):\n\n"
         "```bash\n"
-        f"uvx --with mlwp-data-specs mlwp.validate_trait <DATASET_PATH_OR_URL> --{trait} {profile}\n"
+        f"uvx --with mlwp-data-specs mlwp.validate_dataset_traits <DATASET_PATH_OR_URL> --{trait} {profile}\n"
         "```\n\n"
         "> Warning: `mlwp-data-specs` is not published on PyPI yet, so this command is\n"
         "> included for future release usage.\n\n"
         "Run directly from GitHub source:\n\n"
         "```bash\n"
-        f'uvx --from "git+https://github.com/leifdenby/mlwp-data-specs" mlwp.validate_trait <DATASET_PATH_OR_URL> --{trait} {profile}\n'
+        f'uvx --from "git+https://github.com/leifdenby/mlwp-data-specs" mlwp.validate_dataset_traits <DATASET_PATH_OR_URL> --{trait} {profile}\n'
         "```\n\n"
         "Python API:\n\n"
         "```python\n"
-        "from mlwp_data_specs import check_dataset\n\n"
-        f'report = check_dataset(ds, {trait}="{profile}")\n'
+        "from mlwp_data_specs import validate_dataset\n\n"
+        f'report = validate_dataset(ds, {trait}="{profile}")\n'
         "```\n"
     )
 

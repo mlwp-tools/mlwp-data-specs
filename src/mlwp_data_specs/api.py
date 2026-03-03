@@ -59,7 +59,7 @@ def _coerce_enum(
         ) from exc
 
 
-def check_dataset(
+def validate_dataset(
     ds: xr.Dataset,
     *,
     time: Time | str | None = None,

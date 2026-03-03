@@ -37,7 +37,7 @@ The repository is organized so spec text, checks, and interfaces are separated b
 
 ```text
 src/mlwp_data_specs/
-├── api.py                         # High-level Python API (check_dataset)
+├── api.py                         # High-level Python API (validate_dataset)
 ├── specs/
 │   └── traits/
 │       ├── spatial_coordinate.py # Inline spatial trait specs + validation wiring
@@ -49,7 +49,7 @@ src/mlwp_data_specs/
 │   └── metadata/
 │       └── coords.py             # standard_name/units/etc checks
 └── traits/
-    ├── cli.py                    # CLI entry point (mlwp.validate_trait)
+    ├── cli.py                    # CLI entry point (mlwp.validate_dataset_traits)
     ├── properties.py             # Space/Time/Uncertainty enums
     ├── specs.py                  # Trait structural spec tables (mxalign-style)
     └── reporting.py              # ValidationReport and check registry helpers
@@ -65,8 +65,8 @@ src/mlwp_data_specs/
 
 The validator is expected to provide both interfaces:
 
-1. Python API: programmatic validation via `check_dataset(ds, time=..., space=..., uncertainty=...)`.
-2. CLI: command-line validation via `mlwp.validate_trait` for local/remote datasets and CI usage.
+1. Python API: programmatic validation via `validate_dataset(ds, time=..., space=..., uncertainty=...)`.
+2. CLI: command-line validation via `mlwp.validate_dataset_traits` for local/remote datasets and CI usage.
 
 ## CLI usage
 
@@ -79,28 +79,28 @@ uv sync
 Run validation for selected traits:
 
 ```bash
-uv run mlwp.validate_trait <DATASET_PATH_OR_URL> --time forecast --space grid --uncertainty deterministic
+uv run mlwp.validate_dataset_traits <DATASET_PATH_OR_URL> --time forecast --space grid --uncertainty deterministic
 ```
 
 Examples:
 
 ```bash
 # Validate a local Zarr dataset
-uv run mlwp.validate_trait /path/to/dataset.zarr --time forecast --space grid
+uv run mlwp.validate_dataset_traits /path/to/dataset.zarr --time forecast --space grid
 
 # Validate a remote S3 dataset with anonymous access
-uv run mlwp.validate_trait s3://bucket/dataset.zarr --time observation --space point --s3-anon
+uv run mlwp.validate_dataset_traits s3://bucket/dataset.zarr --time observation --space point --s3-anon
 
 # List available trait values
-uv run mlwp.validate_trait --list-time
-uv run mlwp.validate_trait --list-space
-uv run mlwp.validate_trait --list-uncertainty
+uv run mlwp.validate_dataset_traits --list-time
+uv run mlwp.validate_dataset_traits --list-space
+uv run mlwp.validate_dataset_traits --list-uncertainty
 ```
 
 Print inline markdown spec text without running validation:
 
 ```bash
-uv run mlwp.validate_trait --time forecast --print-spec-markdown
+uv run mlwp.validate_dataset_traits --time forecast --print-spec-markdown
 ```
 
 ## Python API usage
@@ -109,12 +109,12 @@ Use the high-level API:
 
 ```python
 import xarray as xr
-from mlwp_data_specs import check_dataset
+from mlwp_data_specs import validate_dataset
 
 # Load dataset from local path or remote store
 ds = xr.open_zarr("/path/to/dataset.zarr")
 
-report = check_dataset(
+report = validate_dataset(
     ds,
     time="forecast",
     space="grid",
@@ -130,7 +130,7 @@ if report.has_fails():
 The API also accepts the requested alias spelling:
 
 ```python
-report = check_dataset(ds, time="forecast", space="grid", uncertaity="deterministic")
+report = validate_dataset(ds, time="forecast", space="grid", uncertaity="deterministic")
 ```
 
 ## Development
