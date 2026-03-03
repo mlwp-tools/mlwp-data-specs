@@ -7,7 +7,7 @@ import textwrap
 import xarray as xr
 
 from mlwp_data_specs.checks.metadata.coords import check_uncertainty_coordinate_metadata
-from mlwp_data_specs.checks.traits.structure import check_uncertainty_trait_structure
+from mlwp_data_specs.checks.traits.uncertainty import check_uncertainty_trait_structure
 from mlwp_data_specs.traits.properties import Uncertainty
 from mlwp_data_specs.traits.reporting import ValidationReport
 

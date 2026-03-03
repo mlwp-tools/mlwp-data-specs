@@ -7,7 +7,7 @@ import textwrap
 import xarray as xr
 
 from mlwp_data_specs.checks.metadata.coords import check_time_coordinate_metadata
-from mlwp_data_specs.checks.traits.structure import check_time_trait_structure
+from mlwp_data_specs.checks.traits.time import check_time_trait_structure
 from mlwp_data_specs.traits.properties import Time
 from mlwp_data_specs.traits.reporting import ValidationReport
 

@@ -7,7 +7,7 @@ import textwrap
 import xarray as xr
 
 from mlwp_data_specs.checks.metadata.coords import check_space_coordinate_metadata
-from mlwp_data_specs.checks.traits.structure import check_space_trait_structure
+from mlwp_data_specs.checks.traits.space import check_space_trait_structure
 from mlwp_data_specs.traits.properties import Space
 from mlwp_data_specs.traits.reporting import ValidationReport
 
