@@ -44,21 +44,6 @@ def validate_dataset(ds: xr.Dataset | None, *, trait: Time) -> tuple[ValidationR
     - `lead_time` MUST have `units` in one of: `s`, `seconds`, `h`, `hours`.
     - If `valid_time` is present, it MUST have `standard_name` equal to `time`.
     """
-        usage_examples = """
-    ### CLI
-
-    ```bash
-    uv run mlwp.validate_trait /path/to/dataset.zarr --time forecast
-    ```
-
-    ### Python API
-
-    ```python
-    from mlwp_data_specs import check_dataset
-
-    report = check_dataset(ds, time="forecast")
-    ```
-    """
     else:
         structural_requirements = """
     - Accepted dimension variant is: `{'valid_time'}`.
@@ -66,21 +51,6 @@ def validate_dataset(ds: xr.Dataset | None, *, trait: Time) -> tuple[ValidationR
     """
         metadata_requirements = """
     - `valid_time` MUST have `standard_name` equal to `time`.
-    """
-        usage_examples = """
-    ### CLI
-
-    ```bash
-    uv run mlwp.validate_trait /path/to/dataset.zarr --time observation
-    ```
-
-    ### Python API
-
-    ```python
-    from mlwp_data_specs import check_dataset
-
-    report = check_dataset(ds, time="observation")
-    ```
     """
 
     spec_text = f"""
@@ -90,11 +60,19 @@ def validate_dataset(ds: xr.Dataset | None, *, trait: Time) -> tuple[ValidationR
     version: {VERSION}
     ---
 
-    ## 1. Scope
+    ## 1. Introduction
 
-    This specification enforces time-coordinate trait conformance for machine-learning weather datasets.
+    This document defines trait-level requirements for time coordinates in MLWP datasets.
+    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+    "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+    interpreted as described in RFC 2119.
 
-    ## 2. Structural Requirements
+    ## 2. Scope
+
+    This specification applies to datasets validated with the `time={trait.value}`
+    profile.
+
+    ## 3. Structural Requirements
 
     {structural_requirements}
     """
@@ -102,17 +80,11 @@ def validate_dataset(ds: xr.Dataset | None, *, trait: Time) -> tuple[ValidationR
     report += check_time_trait_structure(ds, trait=trait)
 
     spec_text += f"""
-    ## 3. Coordinate Metadata Requirements
+    ## 4. Coordinate Metadata Requirements
 
     {metadata_requirements}
     """
 
     report += check_time_coordinate_metadata(ds, trait=trait)
-
-    spec_text += f"""
-    ## 4. How To Run This Trait Profile
-
-    {usage_examples}
-    """
 
     return report, textwrap.dedent(spec_text)

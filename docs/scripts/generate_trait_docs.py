@@ -91,13 +91,69 @@ def _write_index(page_names: list[str]) -> None:
     (DOCS_DIR / "index.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def _usage_examples_for_page(page_name: str) -> str:
+    """Return docs-only usage examples for a generated trait page.
+
+    Parameters
+    ----------
+    page_name : str
+        Generated page base name (for example ``space_grid``).
+
+    Returns
+    -------
+    str
+        Markdown section with CLI and Python examples for the page profile.
+    """
+    trait, profile = page_name.split("_", 1)
+    cli_flag = trait
+    api_kwarg = trait
+
+    return (
+        "## 5. How To Run This Trait Profile (Docs)\n\n"
+        "Run with `uvx` from release on [pypi.org](https://pypi.org/):\n\n"
+        "```bash\n"
+        f"uvx --with mlwp-data-specs mlwp.validate_trait <DATASET_PATH_OR_URL> --{cli_flag} {profile}\n"
+        "```\n\n"
+        "> Warning: `mlwp-data-specs` is not published on PyPI yet, so this command is\n"
+        "> included for future release usage.\n\n"
+        "Run directly from GitHub source:\n\n"
+        "```bash\n"
+        f'uvx --from "git+https://github.com/leifdenby/mlwp-data-specs" mlwp.validate_trait <DATASET_PATH_OR_URL> --{cli_flag} {profile}\n'
+        "```\n\n"
+        "Python API:\n\n"
+        "```python\n"
+        "from mlwp_data_specs import check_dataset\n\n"
+        f'report = check_dataset(ds, {api_kwarg}="{profile}")\n'
+        "```\n"
+    )
+
+
+def _render_trait_page(page_name: str, content: str) -> str:
+    """Render one trait page with docs-only additions.
+
+    Parameters
+    ----------
+    page_name : str
+        Generated page base name.
+    content : str
+        Base inline spec markdown from the validator module.
+
+    Returns
+    -------
+    str
+        Markdown page content including docs-only usage examples.
+    """
+    return content.strip() + "\n\n" + _usage_examples_for_page(page_name) + "\n"
+
+
 def main() -> None:
     """Generate all trait markdown docs under ``docs/traits``."""
     TRAITS_DIR.mkdir(parents=True, exist_ok=True)
     pages = _render_specs()
 
     for name, content in pages.items():
-        (TRAITS_DIR / f"{name}.md").write_text(content.strip() + "\n", encoding="utf-8")
+        rendered = _render_trait_page(name, content)
+        (TRAITS_DIR / f"{name}.md").write_text(rendered, encoding="utf-8")
 
     _write_index(sorted(pages.keys()))
 

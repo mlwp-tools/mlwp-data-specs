@@ -38,41 +38,11 @@ def validate_dataset(ds: xr.Dataset | None, *, trait: Space) -> tuple[Validation
     - Required coordinates are: `longitude`, `latitude`.
     - Optional projected coordinates are: `xc`, `yc`.
     """
-        usage_examples = """
-    ### CLI
-
-    ```bash
-    uv run mlwp.validate_trait /path/to/dataset.zarr --space grid
-    ```
-
-    ### Python API
-
-    ```python
-    from mlwp_data_specs import check_dataset
-
-    report = check_dataset(ds, space="grid")
-    ```
-    """
     else:
         structural_requirements = """
     - Accepted dimension variant is: `{'point_index'}`.
     - Required coordinates are: `longitude`, `latitude`.
     - Optional point metadata coordinates are: `code`, `elevation`, `name`, `country`.
-    """
-        usage_examples = """
-    ### CLI
-
-    ```bash
-    uv run mlwp.validate_trait /path/to/dataset.zarr --space point
-    ```
-
-    ### Python API
-
-    ```python
-    from mlwp_data_specs import check_dataset
-
-    report = check_dataset(ds, space="point")
-    ```
     """
 
     spec_text = f"""
@@ -82,11 +52,19 @@ def validate_dataset(ds: xr.Dataset | None, *, trait: Space) -> tuple[Validation
     version: {VERSION}
     ---
 
-    ## 1. Scope
+    ## 1. Introduction
 
-    This specification enforces spatial-coordinate trait conformance for gridded and point datasets.
+    This document defines trait-level requirements for spatial coordinates in MLWP datasets.
+    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+    "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+    interpreted as described in RFC 2119.
 
-    ## 2. Structural Requirements
+    ## 2. Scope
+
+    This specification applies to datasets validated with the `space={trait.value}`
+    profile.
+
+    ## 3. Structural Requirements
 
     {structural_requirements}
     """
@@ -94,18 +72,12 @@ def validate_dataset(ds: xr.Dataset | None, *, trait: Space) -> tuple[Validation
     report += check_space_trait_structure(ds, trait=trait)
 
     spec_text += """
-    ## 3. Coordinate Metadata Requirements
+    ## 4. Coordinate Metadata Requirements
 
     - Longitude/latitude coordinates MUST carry CF-compatible `standard_name` and angular units.
     - If projected coordinates are present (`xc`, `yc`), they MUST expose projection coordinate metadata.
     """
 
     report += check_space_coordinate_metadata(ds, trait=trait)
-
-    spec_text += f"""
-    ## 4. How To Run This Trait Profile
-
-    {usage_examples}
-    """
 
     return report, textwrap.dedent(spec_text)

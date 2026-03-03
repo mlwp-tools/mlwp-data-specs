@@ -39,21 +39,6 @@ def validate_dataset(ds: xr.Dataset | None, *, trait: Uncertainty) -> tuple[Vali
         metadata_requirements = """
     - No uncertainty coordinate metadata is required.
     """
-        usage_examples = """
-    ### CLI
-
-    ```bash
-    uv run mlwp.validate_trait /path/to/dataset.zarr --uncertainty deterministic
-    ```
-
-    ### Python API
-
-    ```python
-    from mlwp_data_specs import check_dataset
-
-    report = check_dataset(ds, uncertainty="deterministic")
-    ```
-    """
     elif trait == Uncertainty.ENSEMBLE:
         structural_requirements = """
     - Accepted dimension variant is: `{'member'}`.
@@ -61,21 +46,6 @@ def validate_dataset(ds: xr.Dataset | None, *, trait: Uncertainty) -> tuple[Vali
     """
         metadata_requirements = """
     - `member` MUST have `standard_name` equal to `realization`.
-    """
-        usage_examples = """
-    ### CLI
-
-    ```bash
-    uv run mlwp.validate_trait /path/to/dataset.zarr --uncertainty ensemble
-    ```
-
-    ### Python API
-
-    ```python
-    from mlwp_data_specs import check_dataset
-
-    report = check_dataset(ds, uncertainty="ensemble")
-    ```
     """
     else:
         structural_requirements = """
@@ -87,21 +57,6 @@ def validate_dataset(ds: xr.Dataset | None, *, trait: Uncertainty) -> tuple[Vali
     - `quantile` MUST have `units` equal to `1`.
     - All `quantile` coordinate values MUST be within `[0, 1]`.
     """
-        usage_examples = """
-    ### CLI
-
-    ```bash
-    uv run mlwp.validate_trait /path/to/dataset.zarr --uncertainty quantile
-    ```
-
-    ### Python API
-
-    ```python
-    from mlwp_data_specs import check_dataset
-
-    report = check_dataset(ds, uncertainty="quantile")
-    ```
-    """
 
     spec_text = f"""
     ---
@@ -110,11 +65,19 @@ def validate_dataset(ds: xr.Dataset | None, *, trait: Uncertainty) -> tuple[Vali
     version: {VERSION}
     ---
 
-    ## 1. Scope
+    ## 1. Introduction
 
-    This specification enforces uncertainty representation requirements.
+    This document defines trait-level requirements for uncertainty representation in
+    MLWP datasets. The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+    "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are
+    to be interpreted as described in RFC 2119.
 
-    ## 2. Structural Requirements
+    ## 2. Scope
+
+    This specification applies to datasets validated with the
+    `uncertainty={trait.value}` profile.
+
+    ## 3. Structural Requirements
 
     {structural_requirements}
     """
@@ -122,17 +85,11 @@ def validate_dataset(ds: xr.Dataset | None, *, trait: Uncertainty) -> tuple[Vali
     report += check_uncertainty_trait_structure(ds, trait=trait)
 
     spec_text += f"""
-    ## 3. Coordinate Metadata Requirements
+    ## 4. Coordinate Metadata Requirements
 
     {metadata_requirements}
     """
 
     report += check_uncertainty_coordinate_metadata(ds, trait=trait)
-
-    spec_text += f"""
-    ## 4. How To Run This Trait Profile
-
-    {usage_examples}
-    """
 
     return report, textwrap.dedent(spec_text)
