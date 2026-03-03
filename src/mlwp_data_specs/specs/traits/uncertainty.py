@@ -48,9 +48,9 @@ def validate_dataset(
 
     spec_text = f"""
     ---
+    version: {VERSION}
     trait: {IDENTIFIER}
     profile: {trait.value}
-    version: {VERSION}
     ---
 
     ## 1. Introduction

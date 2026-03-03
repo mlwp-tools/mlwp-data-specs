@@ -6,6 +6,18 @@ theme:
   name: material
   features:
     - navigation.expand
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - tables
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - toc:
+      permalink: true
 
 nav:
   - Home: index.md

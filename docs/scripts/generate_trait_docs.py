@@ -214,7 +214,14 @@ def _render_trait_page(page_name: str, content: str) -> str:
     source_path = _source_path_for_trait(trait)
     source_url = f"{REPO_URL}/blob/{DEFAULT_BRANCH}/{source_path}"
 
-    frontmatter_lines = [f"{k}: {v}" for k, v in sorted(frontmatter.items())]
+    frontmatter_order = ("version", "trait", "profile")
+    frontmatter_lines: list[str] = []
+    for key in frontmatter_order:
+        if key in frontmatter:
+            frontmatter_lines.append(f"{key}: {frontmatter[key]}")
+    for key in frontmatter:
+        if key not in frontmatter_order:
+            frontmatter_lines.append(f"{key}: {frontmatter[key]}")
     frontmatter_block = "\n".join(frontmatter_lines)
     usage = _usage_block_for_page(page_name).strip()
 
