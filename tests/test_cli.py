@@ -5,7 +5,7 @@ from __future__ import annotations
 import xarray as xr
 from pytest import CaptureFixture, MonkeyPatch
 
-from mlwp_data_specs.traits import cli
+from mlwp_data_specs.specs import cli
 
 
 def _forecast_grid_ds() -> xr.Dataset:

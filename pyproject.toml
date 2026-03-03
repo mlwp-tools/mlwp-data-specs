@@ -30,7 +30,7 @@ test = [
 ]
 
 [project.scripts]
-"mlwp.validate_dataset_traits" = "mlwp_data_specs.traits.cli:main"
+"mlwp.validate_dataset_traits" = "mlwp_data_specs.specs.cli:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

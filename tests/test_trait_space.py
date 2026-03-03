@@ -4,8 +4,7 @@ from __future__ import annotations
 
 import xarray as xr
 
-from mlwp_data_specs.specs.traits.spatial_coordinate import validate_dataset
-from mlwp_data_specs.traits.properties import Space
+from mlwp_data_specs.specs.traits.spatial_coordinate import Space, validate_dataset
 
 
 def _grid_ds(with_metadata: bool = True) -> xr.Dataset:

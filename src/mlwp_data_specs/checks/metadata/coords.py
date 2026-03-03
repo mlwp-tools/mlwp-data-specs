@@ -6,8 +6,7 @@ from collections.abc import Iterable
 
 import xarray as xr
 
-from mlwp_data_specs.traits.properties import Space, Time, Uncertainty
-from mlwp_data_specs.traits.reporting import ValidationReport, log_function_call
+from mlwp_data_specs.specs.reporting import ValidationReport, log_function_call
 
 
 def _fmt_required(expected: Iterable[str]) -> str:
@@ -82,7 +81,7 @@ def check_coordinate_attrs(
 
 @log_function_call
 def check_space_coordinate_metadata(
-    ds: xr.Dataset, *, trait: Space
+    ds: xr.Dataset, *, trait: object
 ) -> ValidationReport:
     """Validate coordinate metadata for the selected space trait.
 
@@ -90,8 +89,9 @@ def check_space_coordinate_metadata(
     ----------
     ds : xr.Dataset
         Dataset being validated.
-    trait : Space
-        Selected space profile.
+    trait : object
+        Selected space profile enum instance (or enum-like object with a
+        ``value`` attribute).
 
     Returns
     -------
@@ -111,7 +111,8 @@ def check_space_coordinate_metadata(
             "units": {"degrees_north"},
         },
     }
-    if trait == Space.GRID:
+    trait_value = str(getattr(trait, "value", trait))
+    if trait_value == "grid":
         expectations.update(
             {
                 "xc": {
@@ -140,15 +141,18 @@ def check_space_coordinate_metadata(
 
 
 @log_function_call
-def check_time_coordinate_metadata(ds: xr.Dataset, *, trait: Time) -> ValidationReport:
+def check_time_coordinate_metadata(
+    ds: xr.Dataset, *, trait: object
+) -> ValidationReport:
     """Validate coordinate metadata for the selected time trait.
 
     Parameters
     ----------
     ds : xr.Dataset
         Dataset being validated.
-    trait : Time
-        Selected time profile.
+    trait : object
+        Selected time profile enum instance (or enum-like object with a
+        ``value`` attribute).
 
     Returns
     -------
@@ -159,11 +163,12 @@ def check_time_coordinate_metadata(ds: xr.Dataset, *, trait: Time) -> Validation
     section = "Time Coordinate"
 
     expectations: dict[str, dict[str, set[str]]] = {}
-    if trait == Time.OBSERVATION:
+    trait_value = str(getattr(trait, "value", trait))
+    if trait_value == "observation":
         expectations["valid_time"] = {
             "standard_name": {"time"},
         }
-    elif trait == Time.FORECAST:
+    elif trait_value == "forecast":
         expectations.update(
             {
                 "reference_time": {
@@ -185,7 +190,7 @@ def check_time_coordinate_metadata(ds: xr.Dataset, *, trait: Time) -> Validation
             required_attrs=required_attrs,
         )
 
-    if "valid_time" in ds.coords and trait == Time.FORECAST:
+    if "valid_time" in ds.coords and trait_value == "forecast":
         report += check_coordinate_attrs(
             ds,
             section=section,
@@ -201,7 +206,7 @@ def check_time_coordinate_metadata(ds: xr.Dataset, *, trait: Time) -> Validation
 def check_uncertainty_coordinate_metadata(
     ds: xr.Dataset,
     *,
-    trait: Uncertainty,
+    trait: object,
 ) -> ValidationReport:
     """Validate coordinate metadata for the selected uncertainty trait.
 
@@ -209,8 +214,9 @@ def check_uncertainty_coordinate_metadata(
     ----------
     ds : xr.Dataset
         Dataset being validated.
-    trait : Uncertainty
-        Selected uncertainty profile.
+    trait : object
+        Selected uncertainty profile enum instance (or enum-like object with a
+        ``value`` attribute).
 
     Returns
     -------
@@ -220,7 +226,8 @@ def check_uncertainty_coordinate_metadata(
     report = ValidationReport()
     section = "Uncertainty"
 
-    if trait == Uncertainty.DETERMINISTIC:
+    trait_value = str(getattr(trait, "value", trait))
+    if trait_value == "deterministic":
         report.add(
             section,
             "Deterministic mode metadata",
@@ -229,7 +236,7 @@ def check_uncertainty_coordinate_metadata(
         )
         return report
 
-    if trait == Uncertainty.ENSEMBLE:
+    if trait_value == "ensemble":
         report += check_coordinate_attrs(
             ds,
             section=section,

@@ -39,20 +39,17 @@ The repository is organized so spec text, checks, and interfaces are separated b
 src/mlwp_data_specs/
 ├── api.py                         # High-level Python API (validate_dataset)
 ├── specs/
+│   ├── cli.py                     # CLI entry point (mlwp.validate_dataset_traits)
+│   ├── reporting.py               # ValidationReport and check registry helpers
 │   └── traits/
-│       ├── spatial_coordinate.py # Inline spatial trait specs + validation wiring
-│       ├── time_coordinate.py    # Inline time trait specs + validation wiring
-│       └── uncertainty.py        # Inline uncertainty trait specs + validation wiring
+│       ├── spatial_coordinate.py  # Space trait enum + specs + validation wiring
+│       ├── time_coordinate.py     # Time trait enum + specs + validation wiring
+│       └── uncertainty.py         # Uncertainty trait enum + specs + validation wiring
 ├── checks/
 │   ├── traits/
-│   │   └── structure.py          # Dimension/required-coordinate checks
+│   │   └── _common.py             # Shared structural check primitives
 │   └── metadata/
-│       └── coords.py             # standard_name/units/etc checks
-└── traits/
-    ├── cli.py                    # CLI entry point (mlwp.validate_dataset_traits)
-    ├── properties.py             # Space/Time/Uncertainty enums
-    ├── specs.py                  # Trait structural spec tables (mxalign-style)
-    └── reporting.py              # ValidationReport and check registry helpers
+│       └── coords.py              # standard_name/units/etc checks
 ```
 
 ## Requirements

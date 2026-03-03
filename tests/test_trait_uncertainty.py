@@ -4,8 +4,7 @@ from __future__ import annotations
 
 import xarray as xr
 
-from mlwp_data_specs.specs.traits.uncertainty import validate_dataset
-from mlwp_data_specs.traits.properties import Uncertainty
+from mlwp_data_specs.specs.traits.uncertainty import Uncertainty, validate_dataset
 
 
 def _quantile_ds(values: list[float], with_attrs: bool = True) -> xr.Dataset:

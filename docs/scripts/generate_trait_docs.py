@@ -7,17 +7,19 @@ import re
 from pathlib import Path
 
 from mlwp_data_specs import __version__
+from mlwp_data_specs.specs.reporting import skip_all_checks
+from mlwp_data_specs.specs.traits.spatial_coordinate import Space
 from mlwp_data_specs.specs.traits.spatial_coordinate import (
     validate_dataset as validate_space,
 )
+from mlwp_data_specs.specs.traits.time_coordinate import Time
 from mlwp_data_specs.specs.traits.time_coordinate import (
     validate_dataset as validate_time,
 )
+from mlwp_data_specs.specs.traits.uncertainty import Uncertainty
 from mlwp_data_specs.specs.traits.uncertainty import (
     validate_dataset as validate_uncertainty,
 )
-from mlwp_data_specs.traits.properties import Space, Time, Uncertainty
-from mlwp_data_specs.traits.reporting import skip_all_checks
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DOCS_DIR = REPO_ROOT / "docs"

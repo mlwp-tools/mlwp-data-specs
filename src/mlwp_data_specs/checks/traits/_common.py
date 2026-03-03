@@ -6,7 +6,7 @@ from typing import Literal
 
 import xarray as xr
 
-from mlwp_data_specs.traits.reporting import ValidationReport, log_function_call
+from mlwp_data_specs.specs.reporting import ValidationReport, log_function_call
 
 AxisName = Literal["space", "time", "uncertainty"]
 

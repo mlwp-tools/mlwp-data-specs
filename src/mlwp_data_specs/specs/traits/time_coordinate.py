@@ -3,16 +3,50 @@
 from __future__ import annotations
 
 import textwrap
+from dataclasses import dataclass, field
+from enum import Enum
 
 import xarray as xr
 
 from mlwp_data_specs.checks.metadata.coords import check_time_coordinate_metadata
-from mlwp_data_specs.checks.traits.time import check_time_trait_structure
-from mlwp_data_specs.traits.properties import Time
-from mlwp_data_specs.traits.reporting import ValidationReport
+from mlwp_data_specs.checks.traits._common import (
+    check_dim_variants,
+    check_required_coords,
+)
+from mlwp_data_specs.specs.reporting import ValidationReport
 
 VERSION = "0.1.0"
 IDENTIFIER = "time_coordinate"
+
+
+class Time(str, Enum):
+    """Supported temporal trait profiles."""
+
+    FORECAST = "forecast"
+    OBSERVATION = "observation"
+
+
+@dataclass
+class PropertySpec:
+    """Structural requirements for a time trait profile."""
+
+    dim_variants: list[set[str]] = field(default_factory=list)
+    required_coords: set[str] = field(default_factory=set)
+    optional_dims: set[str] = field(default_factory=set)
+    optional_coords: set[str] = field(default_factory=set)
+
+
+TIME_SPECS: dict[str, PropertySpec] = {
+    "forecast": PropertySpec(
+        dim_variants=[{"reference_time", "lead_time"}],
+        required_coords={"reference_time", "lead_time"},
+        optional_coords={"valid_time"},
+    ),
+    "observation": PropertySpec(
+        dim_variants=[{"valid_time"}],
+        required_coords={"valid_time"},
+    ),
+}
 
 
 def validate_dataset(
@@ -79,7 +113,11 @@ def validate_dataset(
     {structural_requirements}
     """
 
-    report += check_time_trait_structure(ds, trait=trait)
+    spec = TIME_SPECS[trait.value]
+    report += check_dim_variants(ds, axis="time", variants=spec.dim_variants)
+    report += check_required_coords(
+        ds, axis="time", required_coords=spec.required_coords
+    )
 
     spec_text += f"""
     ## 4. Coordinate Metadata Requirements
