@@ -76,7 +76,7 @@ def validate_dataset(ds: xr.Dataset | None, *, trait: Uncertainty) -> tuple[Vali
 
     report += check_uncertainty_trait_structure(ds, trait=trait)
 
-    spec_text += """
+    spec_text += f"""
     ## 3. Coordinate Metadata Requirements
 
     {metadata_requirements}
