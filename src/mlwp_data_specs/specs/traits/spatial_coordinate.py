@@ -85,8 +85,8 @@ def validate_dataset(
         )
     elif trait == Space.POINT:
         spec_text += """
-    - The dataset MUST match one accepted dimension variant for this profile:
-      `[{'point_index'}]`.
+    - The dataset MUST include the `point_index` dimension for the spatial axis.
+    - This profile enforces the single spatial dimension variant `{'point_index'}`.
     """
         report += check_dim_variants(ds, axis="space", variants=[{"point_index"}])
     else:

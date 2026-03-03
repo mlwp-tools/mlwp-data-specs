@@ -76,14 +76,14 @@ def validate_dataset(
         report += check_dim_variants(ds, axis="uncertainty", variants=[])
     elif trait == Uncertainty.ENSEMBLE:
         spec_text += """
-    - The dataset MUST match one accepted dimension variant for this profile:
-      `[{'member'}]`.
+    - The dataset MUST include the `member` dimension for uncertainty realizations.
+    - This profile enforces the single uncertainty dimension variant `{'member'}`.
     """
         report += check_dim_variants(ds, axis="uncertainty", variants=[{"member"}])
     elif trait == Uncertainty.QUANTILE:
         spec_text += """
-    - The dataset MUST match one accepted dimension variant for this profile:
-      `[{'quantile'}]`.
+    - The dataset MUST include the `quantile` dimension for uncertainty representation.
+    - This profile enforces the single uncertainty dimension variant `{'quantile'}`.
     """
         report += check_dim_variants(ds, axis="uncertainty", variants=[{"quantile"}])
     else:

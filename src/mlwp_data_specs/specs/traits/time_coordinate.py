@@ -70,16 +70,17 @@ def validate_dataset(
     """
     if trait == Time.FORECAST:
         spec_text += """
-    - The dataset MUST match one accepted dimension variant for this profile:
-      `[{'reference_time', 'lead_time'}]`.
+    - The dataset MUST include both `reference_time` and `lead_time` dimensions.
+    - This profile enforces the single time dimension variant
+      `{'reference_time', 'lead_time'}`.
     """
         report += check_dim_variants(
             ds, axis="time", variants=[{"reference_time", "lead_time"}]
         )
     elif trait == Time.OBSERVATION:
         spec_text += """
-    - The dataset MUST match one accepted dimension variant for this profile:
-      `[{'valid_time'}]`.
+    - The dataset MUST include the `valid_time` dimension.
+    - This profile enforces the single time dimension variant `{'valid_time'}`.
     """
         report += check_dim_variants(ds, axis="time", variants=[{"valid_time"}])
     else:
