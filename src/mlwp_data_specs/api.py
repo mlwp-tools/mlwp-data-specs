@@ -7,16 +7,24 @@ from typing import TypeVar
 
 import xarray as xr
 
-from mlwp_data_specs.specs.traits.spatial_coordinate import validate_dataset as validate_space
-from mlwp_data_specs.specs.traits.time_coordinate import validate_dataset as validate_time
-from mlwp_data_specs.specs.traits.uncertainty import validate_dataset as validate_uncertainty
+from mlwp_data_specs.specs.traits.spatial_coordinate import (
+    validate_dataset as validate_space,
+)
+from mlwp_data_specs.specs.traits.time_coordinate import (
+    validate_dataset as validate_time,
+)
+from mlwp_data_specs.specs.traits.uncertainty import (
+    validate_dataset as validate_uncertainty,
+)
 from mlwp_data_specs.traits.properties import Space, Time, Uncertainty
 from mlwp_data_specs.traits.reporting import ValidationReport
 
 EnumType = TypeVar("EnumType", bound=Enum)
 
 
-def _coerce_enum(value: EnumType | str | None, enum_cls: type[EnumType], name: str) -> EnumType | None:
+def _coerce_enum(
+    value: EnumType | str | None, enum_cls: type[EnumType], name: str
+) -> EnumType | None:
     """Coerce user input into an enum value.
 
     Parameters
@@ -46,7 +54,9 @@ def _coerce_enum(value: EnumType | str | None, enum_cls: type[EnumType], name: s
         return enum_cls(value)
     except ValueError as exc:
         choices = ", ".join(item.value for item in enum_cls)
-        raise ValueError(f"Invalid value for '{name}': {value!r}. Expected one of: {choices}") from exc
+        raise ValueError(
+            f"Invalid value for '{name}': {value!r}. Expected one of: {choices}"
+        ) from exc
 
 
 def check_dataset(

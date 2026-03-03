@@ -81,7 +81,9 @@ def check_coordinate_attrs(
 
 
 @log_function_call
-def check_space_coordinate_metadata(ds: xr.Dataset, *, trait: Space) -> ValidationReport:
+def check_space_coordinate_metadata(
+    ds: xr.Dataset, *, trait: Space
+) -> ValidationReport:
     """Validate coordinate metadata for the selected space trait.
 
     Parameters
@@ -219,7 +221,12 @@ def check_uncertainty_coordinate_metadata(
     section = "Uncertainty"
 
     if trait == Uncertainty.DETERMINISTIC:
-        report.add(section, "Deterministic mode metadata", "PASS", "No uncertainty coordinate required")
+        report.add(
+            section,
+            "Deterministic mode metadata",
+            "PASS",
+            "No uncertainty coordinate required",
+        )
         return report
 
     if trait == Uncertainty.ENSEMBLE:

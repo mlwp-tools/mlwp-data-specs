@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import xarray as xr
 import pytest
+import xarray as xr
 
 from mlwp_data_specs import check_dataset
 
@@ -25,9 +25,15 @@ def _forecast_grid_ds() -> xr.Dataset:
         }
     )
     ds.coords["reference_time"].attrs["standard_name"] = "forecast_reference_time"
-    ds.coords["lead_time"].attrs.update({"standard_name": "forecast_period", "units": "hours"})
-    ds.coords["longitude"].attrs.update({"standard_name": "longitude", "units": "degrees_east"})
-    ds.coords["latitude"].attrs.update({"standard_name": "latitude", "units": "degrees_north"})
+    ds.coords["lead_time"].attrs.update(
+        {"standard_name": "forecast_period", "units": "hours"}
+    )
+    ds.coords["longitude"].attrs.update(
+        {"standard_name": "longitude", "units": "degrees_east"}
+    )
+    ds.coords["latitude"].attrs.update(
+        {"standard_name": "latitude", "units": "degrees_north"}
+    )
     return ds
 
 
@@ -39,7 +45,9 @@ def test_check_dataset_accepts_string_traits() -> None:
 
 def test_check_dataset_supports_uncertaity_alias() -> None:
     """API accepts the spelled-as-requested uncertainty alias argument."""
-    report = check_dataset(_forecast_grid_ds(), time="forecast", space="grid", uncertaity="deterministic")
+    report = check_dataset(
+        _forecast_grid_ds(), time="forecast", space="grid", uncertaity="deterministic"
+    )
     assert not report.has_fails()
 
 

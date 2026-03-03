@@ -15,7 +15,9 @@ VERSION = "0.1.0"
 IDENTIFIER = "spatial_coordinate"
 
 
-def validate_dataset(ds: xr.Dataset | None, *, trait: Space) -> tuple[ValidationReport, str]:
+def validate_dataset(
+    ds: xr.Dataset | None, *, trait: Space
+) -> tuple[ValidationReport, str]:
     """Validate a dataset against the selected space trait specification.
 
     Parameters

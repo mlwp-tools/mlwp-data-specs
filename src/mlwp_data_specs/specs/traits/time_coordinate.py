@@ -15,7 +15,9 @@ VERSION = "0.1.0"
 IDENTIFIER = "time_coordinate"
 
 
-def validate_dataset(ds: xr.Dataset | None, *, trait: Time) -> tuple[ValidationReport, str]:
+def validate_dataset(
+    ds: xr.Dataset | None, *, trait: Time
+) -> tuple[ValidationReport, str]:
     """Validate a dataset against the selected time trait specification.
 
     Parameters

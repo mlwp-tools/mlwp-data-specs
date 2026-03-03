@@ -15,7 +15,9 @@ VERSION = "0.1.0"
 IDENTIFIER = "uncertainty"
 
 
-def validate_dataset(ds: xr.Dataset | None, *, trait: Uncertainty) -> tuple[ValidationReport, str]:
+def validate_dataset(
+    ds: xr.Dataset | None, *, trait: Uncertainty
+) -> tuple[ValidationReport, str]:
     """Validate a dataset against the selected uncertainty trait specification.
 
     Parameters

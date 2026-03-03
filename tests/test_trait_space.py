@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import xarray as xr
 
-from mlwp_data_specs.traits.properties import Space
 from mlwp_data_specs.specs.traits.spatial_coordinate import validate_dataset
+from mlwp_data_specs.traits.properties import Space
 
 
 def _grid_ds(with_metadata: bool = True) -> xr.Dataset:
@@ -28,8 +28,12 @@ def _grid_ds(with_metadata: bool = True) -> xr.Dataset:
         }
     )
     if with_metadata:
-        ds.coords["longitude"].attrs.update({"standard_name": "longitude", "units": "degrees_east"})
-        ds.coords["latitude"].attrs.update({"standard_name": "latitude", "units": "degrees_north"})
+        ds.coords["longitude"].attrs.update(
+            {"standard_name": "longitude", "units": "degrees_east"}
+        )
+        ds.coords["latitude"].attrs.update(
+            {"standard_name": "latitude", "units": "degrees_north"}
+        )
     return ds
 
 

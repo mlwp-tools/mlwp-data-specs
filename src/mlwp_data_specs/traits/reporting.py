@@ -63,7 +63,9 @@ class Result:
     def __post_init__(self) -> None:
         valid = {"FAIL", "WARNING", "PASS"}
         if self.status not in valid:
-            raise ValueError(f"Invalid status {self.status}. Expected one of {sorted(valid)}")
+            raise ValueError(
+                f"Invalid status {self.status}. Expected one of {sorted(valid)}"
+            )
 
 
 @dataclass
@@ -73,7 +75,9 @@ class ValidationReport:
     ok: bool = True
     results: List[Result] = field(default_factory=list)
 
-    def add(self, section: str, requirement: str, status: str, detail: str = "") -> None:
+    def add(
+        self, section: str, requirement: str, status: str, detail: str = ""
+    ) -> None:
         """Append a new result entry to the report.
 
         Parameters
@@ -87,7 +91,11 @@ class ValidationReport:
         detail : str, optional
             Additional context for the result row.
         """
-        self.results.append(Result(section=section, requirement=requirement, status=status, detail=detail))
+        self.results.append(
+            Result(
+                section=section, requirement=requirement, status=status, detail=detail
+            )
+        )
         if status == "FAIL":
             self.ok = False
 

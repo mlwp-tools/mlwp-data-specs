@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import xarray as xr
 
-from mlwp_data_specs.checks.traits._common import check_dim_variants, check_required_coords
+from mlwp_data_specs.checks.traits._common import (
+    check_dim_variants,
+    check_required_coords,
+)
 from mlwp_data_specs.traits.properties import Time
 from mlwp_data_specs.traits.reporting import ValidationReport, log_function_call
 from mlwp_data_specs.traits.specs import TIME_SPECS
@@ -29,5 +32,7 @@ def check_time_trait_structure(ds: xr.Dataset, *, trait: Time) -> ValidationRepo
     spec = TIME_SPECS[trait]
     report = ValidationReport()
     report += check_dim_variants(ds, axis="time", variants=spec.dim_variants)
-    report += check_required_coords(ds, axis="time", required_coords=spec.required_coords)
+    report += check_required_coords(
+        ds, axis="time", required_coords=spec.required_coords
+    )
     return report

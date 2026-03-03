@@ -7,11 +7,17 @@ import re
 from pathlib import Path
 
 from mlwp_data_specs import __version__
+from mlwp_data_specs.specs.traits.spatial_coordinate import (
+    validate_dataset as validate_space,
+)
+from mlwp_data_specs.specs.traits.time_coordinate import (
+    validate_dataset as validate_time,
+)
+from mlwp_data_specs.specs.traits.uncertainty import (
+    validate_dataset as validate_uncertainty,
+)
 from mlwp_data_specs.traits.properties import Space, Time, Uncertainty
 from mlwp_data_specs.traits.reporting import skip_all_checks
-from mlwp_data_specs.specs.traits.spatial_coordinate import validate_dataset as validate_space
-from mlwp_data_specs.specs.traits.time_coordinate import validate_dataset as validate_time
-from mlwp_data_specs.specs.traits.uncertainty import validate_dataset as validate_uncertainty
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DOCS_DIR = REPO_ROOT / "docs"
@@ -38,8 +44,12 @@ def _render_specs() -> dict[str, str]:
         _, pages["uncertainty_deterministic"] = validate_uncertainty(
             None, trait=Uncertainty.DETERMINISTIC
         )
-        _, pages["uncertainty_ensemble"] = validate_uncertainty(None, trait=Uncertainty.ENSEMBLE)
-        _, pages["uncertainty_quantile"] = validate_uncertainty(None, trait=Uncertainty.QUANTILE)
+        _, pages["uncertainty_ensemble"] = validate_uncertainty(
+            None, trait=Uncertainty.ENSEMBLE
+        )
+        _, pages["uncertainty_quantile"] = validate_uncertainty(
+            None, trait=Uncertainty.QUANTILE
+        )
 
     return pages
 
@@ -63,7 +73,9 @@ def _write_index(page_names: list[str]) -> None:
         elif name.startswith("time_"):
             grouped_pages["time"].append((name, name.removeprefix("time_")))
         elif name.startswith("uncertainty_"):
-            grouped_pages["uncertainty"].append((name, name.removeprefix("uncertainty_")))
+            grouped_pages["uncertainty"].append(
+                (name, name.removeprefix("uncertainty_"))
+            )
 
     lines = [
         "# MLWP Trait Specifications",

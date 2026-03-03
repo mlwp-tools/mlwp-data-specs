@@ -11,11 +11,17 @@ import xarray as xr
 from loguru import logger
 
 from mlwp_data_specs import __version__
+from mlwp_data_specs.specs.traits.spatial_coordinate import (
+    validate_dataset as validate_space,
+)
+from mlwp_data_specs.specs.traits.time_coordinate import (
+    validate_dataset as validate_time,
+)
+from mlwp_data_specs.specs.traits.uncertainty import (
+    validate_dataset as validate_uncertainty,
+)
 from mlwp_data_specs.traits.properties import Space, Time, Uncertainty
 from mlwp_data_specs.traits.reporting import ValidationReport, skip_all_checks
-from mlwp_data_specs.specs.traits.spatial_coordinate import validate_dataset as validate_space
-from mlwp_data_specs.specs.traits.time_coordinate import validate_dataset as validate_time
-from mlwp_data_specs.specs.traits.uncertainty import validate_dataset as validate_uncertainty
 
 EnumType = TypeVar("EnumType", bound=Enum)
 
@@ -51,7 +57,9 @@ def build_parser() -> argparse.ArgumentParser:
         )
     )
     parser.add_argument("dataset_path", nargs="?", help="Path/URL to dataset (zarr)")
-    parser.add_argument("--space", choices=_choice_values(Space), help="Space trait name")
+    parser.add_argument(
+        "--space", choices=_choice_values(Space), help="Space trait name"
+    )
     parser.add_argument("--time", choices=_choice_values(Time), help="Time trait name")
     parser.add_argument(
         "--uncertainty",
@@ -63,14 +71,20 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Optional S3 endpoint URL for opening the dataset",
     )
-    parser.add_argument("--s3-anon", action="store_true", help="Use anonymous S3 access")
+    parser.add_argument(
+        "--s3-anon", action="store_true", help="Use anonymous S3 access"
+    )
     parser.add_argument(
         "--print-spec-markdown",
         action="store_true",
         help="Print selected trait specs without running checks",
     )
-    parser.add_argument("--list-space", action="store_true", help="List supported space trait values")
-    parser.add_argument("--list-time", action="store_true", help="List supported time trait values")
+    parser.add_argument(
+        "--list-space", action="store_true", help="List supported space trait values"
+    )
+    parser.add_argument(
+        "--list-time", action="store_true", help="List supported time trait values"
+    )
     parser.add_argument(
         "--list-uncertainty",
         action="store_true",
@@ -173,7 +187,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     uncertainty = Uncertainty(args.uncertainty) if args.uncertainty else None
 
     if not any([space, time, uncertainty]):
-        parser.error("At least one trait must be selected with --space/--time/--uncertainty")
+        parser.error(
+            "At least one trait must be selected with --space/--time/--uncertainty"
+        )
 
     if not args.print_spec_markdown and not args.dataset_path:
         parser.error("dataset_path is required unless --print-spec-markdown is used")

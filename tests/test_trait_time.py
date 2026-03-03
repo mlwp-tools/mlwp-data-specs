@@ -5,8 +5,8 @@ from __future__ import annotations
 import numpy as np
 import xarray as xr
 
-from mlwp_data_specs.traits.properties import Time
 from mlwp_data_specs.specs.traits.time_coordinate import validate_dataset
+from mlwp_data_specs.traits.properties import Time
 
 
 def _observation_ds(valid: bool = True) -> xr.Dataset:
@@ -23,7 +23,12 @@ def _observation_ds(valid: bool = True) -> xr.Dataset:
         Test dataset instance.
     """
     ds = xr.Dataset(
-        coords={"valid_time": ("valid_time", np.array(["2026-01-01T00:00:00"], dtype="datetime64[ns]"))}
+        coords={
+            "valid_time": (
+                "valid_time",
+                np.array(["2026-01-01T00:00:00"], dtype="datetime64[ns]"),
+            )
+        }
     )
     if valid:
         ds.coords["valid_time"].attrs["standard_name"] = "time"

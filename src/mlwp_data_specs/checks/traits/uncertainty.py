@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import xarray as xr
 
-from mlwp_data_specs.checks.traits._common import check_dim_variants, check_required_coords
+from mlwp_data_specs.checks.traits._common import (
+    check_dim_variants,
+    check_required_coords,
+)
 from mlwp_data_specs.traits.properties import Uncertainty
 from mlwp_data_specs.traits.reporting import ValidationReport, log_function_call
 from mlwp_data_specs.traits.specs import UNCERTAINTY_SPECS

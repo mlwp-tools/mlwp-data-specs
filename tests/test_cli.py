@@ -25,9 +25,15 @@ def _forecast_grid_ds() -> xr.Dataset:
         }
     )
     ds.coords["reference_time"].attrs["standard_name"] = "forecast_reference_time"
-    ds.coords["lead_time"].attrs.update({"standard_name": "forecast_period", "units": "hours"})
-    ds.coords["longitude"].attrs.update({"standard_name": "longitude", "units": "degrees_east"})
-    ds.coords["latitude"].attrs.update({"standard_name": "latitude", "units": "degrees_north"})
+    ds.coords["lead_time"].attrs.update(
+        {"standard_name": "forecast_period", "units": "hours"}
+    )
+    ds.coords["longitude"].attrs.update(
+        {"standard_name": "longitude", "units": "degrees_east"}
+    )
+    ds.coords["latitude"].attrs.update(
+        {"standard_name": "latitude", "units": "degrees_north"}
+    )
     return ds
 
 
