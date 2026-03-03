@@ -10,6 +10,7 @@ wheels/
 .venv
 site/
 docs/traits/*.md
+docs/index.md
 
 mxalign/
 mlcast-dataset-validator/
