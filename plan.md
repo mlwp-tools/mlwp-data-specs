@@ -21,9 +21,9 @@ This validator should enforce coordinate naming/metadata constraints (`name`, `s
 - [x] Phase 5: CLI trait selectors implemented (`--space`, `--time`, `--uncertainty`)
 - [x] Phase 5: CLI listing commands implemented (`--list-space`, `--list-time`, `--list-uncertainty`)
 - [x] Phase 6: Trait docs generator implemented and HTML docs build configured
-- [ ] Phase 7: Unit and CLI tests implemented
-- [ ] Phase 7: Integration test against HARMONIE Zarr URL pattern implemented
-- [ ] Definition of Done satisfied
+- [x] Phase 7: Unit and CLI tests implemented
+- [x] Phase 7: Integration test against HARMONIE Zarr URL pattern implemented
+- [x] Definition of Done satisfied
 
 ---
 
