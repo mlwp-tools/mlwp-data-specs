@@ -9,6 +9,7 @@ wheels/
 # Virtual environments
 .venv
 site/
+docs/traits/*.md
 
 mxalign/
 mlcast-dataset-validator/
