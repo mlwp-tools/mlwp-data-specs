@@ -1,4 +1,6 @@
 """MLWP data specifications package."""
 
-__all__ = ["__version__"]
+from .api import check_dataset
+
+__all__ = ["__version__", "check_dataset"]
 __version__ = "0.1.0"
