@@ -158,7 +158,7 @@ class ValidationReport:
         table.add_column("Detail", style="italic")
         table.add_column("Check Function", style="bold")
 
-        emojis = {"FAIL": "FAIL", "WARNING": "WARN", "PASS": "PASS"}
+        emojis = {"FAIL": "❌", "WARNING": "⚠️", "PASS": "✅"}
         for result in self.results:
             function_name = "N/A"
             if result.module and result.function:
