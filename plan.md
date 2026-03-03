@@ -13,7 +13,7 @@ This validator should enforce coordinate naming/metadata constraints (`name`, `s
 
 ## Implementation Checklist
 
-- [ ] Phase 0: Package baseline and dependency setup completed
+- [x] Phase 0: Package baseline and dependency setup completed
 - [ ] Phase 1: Reporting model (`Result`, `ValidationReport`, check registry) implemented
 - [ ] Phase 2: `mxalign` trait semantics adapted (space/time/uncertainty structure checks)
 - [ ] Phase 3: Coordinate metadata checks implemented (`standard_name`, units, axis/attrs)
