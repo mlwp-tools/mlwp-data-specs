@@ -1,6 +1,6 @@
 site_name: MLWP Data Specs
 site_description: Trait-based dataset validation specifications
-repo_url: https://github.com/leifdenby/mlwp-data-specs
+repo_url: https://github.com/mlwp-tools/mlwp-data-specs
 docs_dir: .
 site_dir: ../site
 

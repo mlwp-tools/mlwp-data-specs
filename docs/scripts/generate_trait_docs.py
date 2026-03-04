@@ -24,7 +24,7 @@ from mlwp_data_specs.specs.traits.uncertainty import (
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DOCS_DIR = REPO_ROOT / "docs"
 TRAITS_DIR = DOCS_DIR / "traits"
-REPO_URL = "https://github.com/leifdenby/mlwp-data-specs"
+REPO_URL = "https://github.com/mlwp-tools/mlwp-data-specs"
 DEFAULT_BRANCH = "main"
 
 
@@ -176,13 +176,13 @@ def _usage_block_for_page(page_name: str) -> str:
     return (
         "Run with `uvx` from release on [pypi.org](https://pypi.org/):\n\n"
         "```bash\n"
-        f"uvx --with mlwp-data-specs mlwp.validate_dataset_traits <DATASET_PATH_OR_URL> --{trait} {profile}\n"
+        f"uvx --with mlwp-data-specs mlwp.validate_dataset_traits --{trait} {profile} <DATASET_PATH_OR_URL>\n"
         "```\n\n"
         "> Warning: `mlwp-data-specs` is not published on PyPI yet, so this command is\n"
         "> included for future release usage.\n\n"
         "Run directly from GitHub source:\n\n"
         "```bash\n"
-        f'uvx --from "git+https://github.com/leifdenby/mlwp-data-specs" mlwp.validate_dataset_traits <DATASET_PATH_OR_URL> --{trait} {profile}\n'
+        f'uvx --from "git+https://github.com/mlwp-tools/mlwp-data-specs" mlwp.validate_dataset_traits --{trait} {profile} <DATASET_PATH_OR_URL>\n'
         "```\n\n"
         "Python API:\n\n"
         "```python\n"
