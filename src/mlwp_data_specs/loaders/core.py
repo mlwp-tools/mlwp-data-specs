@@ -64,24 +64,19 @@ def import_loader_hooks(loader: str) -> LoaderHooks:
     """
     module = _load_module(loader)
     hooks: LoaderHooks = {}
-    variable_hooks = {
-        "open_kwargs": ("OPEN_KWARGS",),
-        "concat_dim": ("CONCAT_DIM",),
-        "valid_time_profiles": ("valid_time_profiles",),
-        "valid_space_profiles": ("valid_space_profiles",),
-        "valid_uncertainty_profiles": ("valid_uncertainty_profiles",),
-    }
-    function_hooks = ("preprocess", "postprocess")
+    supported_hooks = (
+        "OPEN_KWARGS",
+        "preprocess",
+        "CONCAT_DIM",
+        "postprocess",
+        "valid_time_profiles",
+        "valid_space_profiles",
+        "valid_uncertainty_profiles",
+    )
 
-    for hook_name, attr_names in variable_hooks.items():
-        for attr_name in attr_names:
-            if hasattr(module, attr_name):
-                hooks[hook_name] = getattr(module, attr_name)
-                break
-
-    for name in function_hooks:
+    for name in supported_hooks:
         if hasattr(module, name):
-            hooks[name] = getattr(module, name)
+            hooks[name.lower()] = getattr(module, name)
     return hooks
 
 
