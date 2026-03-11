@@ -102,7 +102,9 @@ def test_cli_uses_loader_module(monkeypatch: MonkeyPatch, tmp_path: Path) -> Non
     assert code == 0
 
 
-def test_cli_accepts_multiple_dataset_paths(monkeypatch: MonkeyPatch, tmp_path: Path) -> None:
+def test_cli_accepts_multiple_dataset_paths(
+    monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
     """CLI passes multiple dataset paths through to the loader-aware opener."""
     observed: dict[str, object] = {}
 

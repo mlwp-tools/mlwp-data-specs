@@ -7,6 +7,7 @@ from collections.abc import Sequence
 from enum import Enum
 from typing import TypeVar
 
+import xarray as xr
 from loguru import logger
 
 from mlwp_data_specs import __version__
@@ -205,7 +206,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
 
     if not args.print_spec_markdown and not args.dataset_paths:
-        parser.error("At least one dataset path is required unless --print-spec-markdown is used")
+        parser.error(
+            "At least one dataset path is required unless --print-spec-markdown is used"
+        )
 
     logger.info(f"Running mlwp-data-specs {__version__}")
 
@@ -226,7 +229,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.s3_anon:
         storage_options["anon"] = True
 
-    dataset_input = args.dataset_paths[0] if len(args.dataset_paths) == 1 else args.dataset_paths
+    dataset_input = (
+        args.dataset_paths[0] if len(args.dataset_paths) == 1 else args.dataset_paths
+    )
 
     ds = open_dataset(
         dataset_input,

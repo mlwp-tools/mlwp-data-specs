@@ -67,7 +67,9 @@ def test_import_loader_hooks_defaults_from_module(tmp_path) -> None:
     assert hooks == {}
 
 
-def test_open_dataset_uses_loader_hooks(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_open_dataset_uses_loader_hooks(
+    tmp_path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """API opens datasets through the configured loader module when requested."""
     loader_file = tmp_path / "loader_hooks.py"
     loader_file.write_text(
@@ -102,7 +104,9 @@ def test_import_loader_hooks_builtin_anemoi_module() -> None:
     assert "valid_time_profiles" not in hooks
 
 
-def test_open_dataset_rejects_incompatible_loader_time(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_open_dataset_rejects_incompatible_loader_time(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """API rejects trait selections that the loader declares as incompatible."""
     monkeypatch.setattr(xr, "open_dataset", lambda *args, **kwargs: _forecast_grid_ds())
 

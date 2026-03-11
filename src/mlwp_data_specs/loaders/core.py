@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import importlib
 import importlib.util
-from collections.abc import Callable, Sequence
+from collections.abc import Sequence
 from pathlib import Path
 from types import ModuleType
 from typing import Any

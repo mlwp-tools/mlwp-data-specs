@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any
-from typing import TypeVar
+from typing import Any, TypeVar
 
 import xarray as xr
 
