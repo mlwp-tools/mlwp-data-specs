@@ -1,6 +1,7 @@
 # mlwp-data-specs
 
-[![Spec Docs](https://img.shields.io/badge/spec%20docs-HTML-blue)](https://leifdenby.github.io/mlwp-data-specs/)
+[![Spec Docs](https://img.shields.io/badge/spec%20docs-HTML-blue)](https://mlwp-tools.github.io/mlwp-data-specs/)
+[![CI](https://github.com/mlwp-tools/mlwp-data-specs/actions/workflows/ci.yml/badge.svg)](https://github.com/mlwp-tools/mlwp-data-specs/actions/workflows/ci.yml)
 
 Trait-based dataset validator for weather/climate datasets in Zarr format.
 
