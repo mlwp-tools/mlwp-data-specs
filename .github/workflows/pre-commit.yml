@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           # don't use python3.12 because flake8 finds extra issues with that
           # version
