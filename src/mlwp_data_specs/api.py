@@ -8,15 +8,21 @@ from typing import TypeVar
 import xarray as xr
 
 from mlwp_data_specs.specs.reporting import ValidationReport
-from mlwp_data_specs.specs.traits.spatial_coordinate import Space
+from mlwp_data_specs.specs.traits.spatial_coordinate import (
+    Space,
+)
 from mlwp_data_specs.specs.traits.spatial_coordinate import (
     validate_dataset as validate_space,
 )
-from mlwp_data_specs.specs.traits.time_coordinate import Time
+from mlwp_data_specs.specs.traits.time_coordinate import (
+    Time,
+)
 from mlwp_data_specs.specs.traits.time_coordinate import (
     validate_dataset as validate_time,
 )
-from mlwp_data_specs.specs.traits.uncertainty import Uncertainty
+from mlwp_data_specs.specs.traits.uncertainty import (
+    Uncertainty,
+)
 from mlwp_data_specs.specs.traits.uncertainty import (
     validate_dataset as validate_uncertainty,
 )
