@@ -145,12 +145,6 @@ if report.has_fails():
     raise SystemExit("Dataset validation failed")
 ```
 
-The API also accepts the requested alias spelling:
-
-```python
-report = validate_dataset(ds, time="forecast", space="grid", uncertaity="deterministic")
-```
-
 ## Development
 
 Run tests:

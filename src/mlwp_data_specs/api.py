@@ -127,9 +127,13 @@ def validate_dataset(
     time: Time | str | None = None,
     space: Space | str | None = None,
     uncertainty: Uncertainty | str | None = None,
-    uncertaity: Uncertainty | str | None = None,
 ) -> ValidationReport:
     """Validate a dataset against selected trait specifications.
+
+    If a trait is not explicitly provided as an argument, this function
+    will attempt to resolve it from the dataset's attributes (e.g.,
+    ``mlwp_time_trait``, ``mlwp_space_trait``, ``mlwp_uncertainty_trait``).
+    If both are provided and differ, the argument takes precedence.
 
     Parameters
     ----------
@@ -142,8 +146,6 @@ def validate_dataset(
     uncertainty : Uncertainty | str | None, optional
         Uncertainty trait profile (for example ``"deterministic"``,
         ``"ensemble"``, or ``"quantile"``).
-    uncertaity : Uncertainty | str | None, optional
-        Backward-compatible alias for ``uncertainty`` (spelling preserved).
 
     Returns
     -------
@@ -155,14 +157,9 @@ def validate_dataset(
     ValueError
         Raised when no traits are selected or when invalid trait values are provided.
     """
-    if uncertainty is not None and uncertaity is not None:
-        raise ValueError("Provide only one of 'uncertainty' or 'uncertaity', not both")
-
-    uncertainty_value = uncertainty if uncertainty is not None else uncertaity
-
     time_trait = _resolve_trait(ds, time, Time)
     space_trait = _resolve_trait(ds, space, Space)
-    uncertainty_trait = _resolve_trait(ds, uncertainty_value, Uncertainty)
+    uncertainty_trait = _resolve_trait(ds, uncertainty, Uncertainty)
 
     if not any([time_trait, space_trait, uncertainty_trait]):
         raise ValueError("At least one trait must be selected")

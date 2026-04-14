@@ -46,14 +46,6 @@ def test_validate_dataset_accepts_string_traits() -> None:
     assert not report.has_fails()
 
 
-def test_validate_dataset_supports_uncertaity_alias() -> None:
-    """API accepts the spelled-as-requested uncertainty alias argument."""
-    report = validate_dataset(
-        _forecast_grid_ds(), time="forecast", space="grid", uncertaity="deterministic"
-    )
-    assert not report.has_fails()
-
-
 def test_validate_dataset_requires_trait() -> None:
     """API raises when no traits are selected."""
     with pytest.raises(ValueError, match="At least one trait"):
