@@ -4,8 +4,14 @@ from __future__ import annotations
 
 import pytest
 import xarray as xr
+from unittest.mock import patch
 
 from mlwp_data_specs import validate_dataset
+from mlwp_data_specs.api import (
+    TIME_TRAIT_ATTR,
+    SPACE_TRAIT_ATTR,
+    UNCERTAINTY_TRAIT_ATTR,
+)
 
 
 def _forecast_grid_ds() -> xr.Dataset:
@@ -55,3 +61,47 @@ def test_validate_dataset_requires_trait() -> None:
     """API raises when no traits are selected."""
     with pytest.raises(ValueError, match="At least one trait"):
         validate_dataset(_forecast_grid_ds())
+
+
+def test_validate_dataset_from_attributes() -> None:
+    """Traits can be loaded from global dataset attributes."""
+    ds = _forecast_grid_ds()
+    ds.attrs[TIME_TRAIT_ATTR] = "forecast"
+    ds.attrs[SPACE_TRAIT_ATTR] = "grid"
+
+    report = validate_dataset(ds)
+    assert not report.has_fails()
+
+
+@patch("mlwp_data_specs.api.logger")
+def test_validate_dataset_attribute_mismatch_warning(mock_logger) -> None:
+    """Mismatch between provided argument and attribute logs a warning."""
+    ds = _forecast_grid_ds()
+    # The dataset has forecast coords, but we put "observation" in the attribute
+    ds.attrs[TIME_TRAIT_ATTR] = "observation"
+
+    # We pass time="forecast" to override the attribute
+    report = validate_dataset(ds, time="forecast", space="grid")
+
+    # Should not fail because "forecast" is used for validation
+    assert not report.has_fails()
+
+    # Check that a warning was emitted
+    mock_logger.warning.assert_called()
+    warning_msg = mock_logger.warning.call_args[0][0]
+    assert "Provided time trait 'forecast' differs" in warning_msg
+    assert "attribute 'mlwp_time_trait' ('observation')" in warning_msg
+
+
+@patch("mlwp_data_specs.api.logger")
+def test_validate_dataset_invalid_attribute_warning(mock_logger) -> None:
+    """Invalid attribute value logs a warning and is ignored if valid arg provided."""
+    ds = _forecast_grid_ds()
+    ds.attrs[TIME_TRAIT_ATTR] = "invalid_time_trait"
+
+    report = validate_dataset(ds, time="forecast", space="grid")
+    assert not report.has_fails()
+
+    mock_logger.warning.assert_called()
+    warning_msg = mock_logger.warning.call_args[0][0]
+    assert "Invalid trait value in attribute 'mlwp_time_trait'" in warning_msg

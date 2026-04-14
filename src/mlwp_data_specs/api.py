@@ -6,6 +6,7 @@ from enum import Enum
 from typing import TypeVar
 
 import xarray as xr
+from loguru import logger
 
 from mlwp_data_specs.specs.reporting import ValidationReport
 from mlwp_data_specs.specs.traits.spatial_coordinate import Space
@@ -20,6 +21,12 @@ from mlwp_data_specs.specs.traits.uncertainty import Uncertainty
 from mlwp_data_specs.specs.traits.uncertainty import (
     validate_dataset as validate_uncertainty,
 )
+
+_TRAIT_ATTR_FORMAT = "mlwp_{}_trait"
+
+TIME_TRAIT_ATTR = _TRAIT_ATTR_FORMAT.format("time")
+SPACE_TRAIT_ATTR = _TRAIT_ATTR_FORMAT.format("space")
+UNCERTAINTY_TRAIT_ATTR = _TRAIT_ATTR_FORMAT.format("uncertainty")
 
 EnumType = TypeVar("EnumType", bound=Enum)
 
@@ -61,6 +68,56 @@ def _coerce_enum(
         ) from exc
 
 
+def _resolve_trait(
+    ds: xr.Dataset,
+    arg_value: EnumType | str | None,
+    attr_name: str,
+    enum_cls: type[EnumType],
+    trait_name: str,
+) -> EnumType | None:
+    """Resolve a trait value from argument or dataset attributes.
+
+    Parameters
+    ----------
+    ds : xr.Dataset
+        The dataset.
+    arg_value : EnumType | str | None
+        The trait value passed as an argument.
+    attr_name : str
+        The global attribute name to check.
+    enum_cls : type[EnumType]
+        The enum class for the trait.
+    trait_name : str
+        The name of the trait (for logging/errors).
+
+    Returns
+    -------
+    EnumType | None
+        The resolved trait value or ``None``.
+    """
+    arg_trait = _coerce_enum(arg_value, enum_cls, trait_name)
+    attr_value = ds.attrs.get(attr_name)
+
+    if attr_value is None:
+        return arg_trait
+
+    try:
+        attr_trait = _coerce_enum(attr_value, enum_cls, f"attribute {attr_name}")
+    except ValueError as exc:
+        logger.warning(f"Invalid trait value in attribute '{attr_name}': {exc}")
+        return arg_trait
+
+    if arg_trait is not None and arg_trait != attr_trait:
+        logger.warning(
+            f"Provided {trait_name} trait '{arg_trait.value}' differs from "
+            f"dataset attribute '{attr_name}' ('{attr_trait.value}'). "
+            f"Using provided trait value '{arg_trait.value}'."
+        )
+        return arg_trait
+
+    return arg_trait if arg_trait is not None else attr_trait
+
+
 def validate_dataset(
     ds: xr.Dataset,
     *,
@@ -100,9 +157,11 @@ def validate_dataset(
 
     uncertainty_value = uncertainty if uncertainty is not None else uncertaity
 
-    time_trait = _coerce_enum(time, Time, "time")
-    space_trait = _coerce_enum(space, Space, "space")
-    uncertainty_trait = _coerce_enum(uncertainty_value, Uncertainty, "uncertainty")
+    time_trait = _resolve_trait(ds, time, TIME_TRAIT_ATTR, Time, "time")
+    space_trait = _resolve_trait(ds, space, SPACE_TRAIT_ATTR, Space, "space")
+    uncertainty_trait = _resolve_trait(
+        ds, uncertainty_value, UNCERTAINTY_TRAIT_ATTR, Uncertainty, "uncertainty"
+    )
 
     if not any([time_trait, space_trait, uncertainty_trait]):
         raise ValueError("At least one trait must be selected")
