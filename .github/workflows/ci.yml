@@ -41,7 +41,7 @@ jobs:
       - name: Build mkdocs
         run: uv run mkdocs build -f docs/mkdocs.yml --strict
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: site
 
