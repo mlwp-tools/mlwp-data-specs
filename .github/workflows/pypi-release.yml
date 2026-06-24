@@ -1,5 +1,5 @@
 ### CI actions are pinned to immutable commit hashes, not mutable tags, to reduce supply-chain risk and help prevent LLM-based CI attacks. See https://github.com/lirantal/pypi-security-best-practices#13-secure-your-cicd-release-pipeline.
-name: publish to pypi
+name: package build and release
 
 on:
   push:
