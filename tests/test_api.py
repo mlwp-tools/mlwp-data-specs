@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+from importlib.metadata import version
 from unittest.mock import patch
 
 import pytest
 import xarray as xr
 
-from mlwp_data_specs import validate_dataset
+from mlwp_data_specs import __version__, validate_dataset
 from mlwp_data_specs.api import SPACE_TRAIT_ATTR, TIME_TRAIT_ATTR
 
 
@@ -44,6 +45,11 @@ def test_validate_dataset_accepts_string_traits() -> None:
     """API accepts string trait selectors and returns a passing report."""
     report = validate_dataset(_forecast_grid_ds(), time="forecast", space="grid")
     assert not report.has_fails()
+
+
+def test_package_version_matches_metadata() -> None:
+    """Package exposes the installed distribution version."""
+    assert __version__ == version("mlwp-data-specs")
 
 
 def test_validate_dataset_requires_trait() -> None:
