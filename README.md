@@ -8,7 +8,7 @@ Trait-based dataset validator for weather/climate datasets in Zarr format.
 ## Why this was made
 
 To facilitate comparing forecasts from MLWP (Machine Learning Weather Prediction) models this validator implements  specifications so that a single well-defined format can be targeted. The motivation for this to allow different groups to share their forecasts in a common format so that general-purpose tooling can be built to examine these forecasts.
-Specifically, the specifications is organized around **traits** (for example, how spatial location is represented) so that downstream tools like [`mxalign`](https://github.com/rmi-mlwp/mxalign) can deterministically map between datasets - or *align* datasets - that represent traits differently (for example, point-wise observations to gridded data, or the inverse mapping).
+Specifically, the specifications is organized around **traits** (for example, how spatial location is represented) so that downstream tools like [`mxalign`](https://github.com/mlwp-tools/mxalign) can deterministically map between datasets - or *align* datasets - that represent traits differently (for example, point-wise observations to gridded data, or the inverse mapping).
 
 In summary, the goals of this project are to:
 
@@ -23,8 +23,12 @@ Use `mlwp-data-specs` when you need to verify that a dataset follows agreed MLWP
 
 The intended split is:
 
-1. `mlwp-data-specs`: define and validate dataset structure/metadata contracts
-2. `mxalign`: perform alignment/transformation operations on datasets
+1. [`mlwp-data-specs`](https://github.com/mlwp-tools/mlwp-data-specs): define and validate dataset (`xarray.Dataset`) structure/metadata contracts
+2. [`mlwp-data-loaders`](https://github.com/mlwp-tools/mlwp-data-loaders): load datasets from various sources (local, S3, etc.) and provide a common interface to construct `xarray.Dataset` object
+   - Uses `mlwp-data-specs` to validate datasets at load time.
+   - Can also use your own code to create `xarray.Dataset` objects from scratch or from other formats (e.g., NetCDF, CSV, etc.)
+3. [`mxalign`](https://github.com/mlwp-tools/mxalign) or your own analysis tools: perform alignment/transformation operations on datasets.
+   - Applies `mlwp-data-specs` to validate datasets before and after alignment.
 
 Typical use cases:
 
