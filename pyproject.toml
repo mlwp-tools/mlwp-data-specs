@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mlwp-data-specs"
-description = "Trait-based dataset validator with inline specs"
+description = "Trait-based xarray weather dataset validator with inline specs"
 readme = "README.md"
 requires-python = ">=3.12"
 dynamic = ["version"]
