@@ -19,7 +19,7 @@ from mlwp_data_specs.checks.traits._common import (
 )
 from mlwp_data_specs.specs.reporting import ValidationReport
 
-VERSION = "0.2.0"
+VERSION = "0.2.0-draft"
 IDENTIFIER = "uncertainty"
 
 
@@ -109,9 +109,10 @@ def validate_dataset(
     - The dataset MUST include the `member` coordinate.
     - `member` MUST be a one-dimensional coordinate variable on the `member`
       dimension, with unique values of an integer dtype.
-    - The `member` values SHOULD be the producer's member identifiers (e.g. GRIB
-      `perturbationNumber`, where 0 is the control member) rather than positional
-      indices; they need not start at 0 or be contiguous.
+    - The `member` values SHOULD be the producer's member identifiers rather
+      than positional indices; they need not start at 0 or be contiguous.
+    - This version of the specification does not define how a control member is
+      identified; no `member` value has a special meaning.
     """
         report += check_required_coords(
             ds, axis="uncertainty", required_coords={"member"}
@@ -137,13 +138,13 @@ def validate_dataset(
     """
     else:
         spec_text += """
-    - The dataset MAY include optional coordinates for this profile: `[]`.
+    - This profile defines no optional coordinates.
     """
 
     spec_text += """
     ### 3.4 Optional Dimensions
 
-    - The dataset MAY include optional dimensions for this profile: `[]`.
+    - This profile defines no optional dimensions.
     """
 
     if trait in (Uncertainty.ENSEMBLE, Uncertainty.QUANTILE):
@@ -171,7 +172,7 @@ def validate_dataset(
     elif trait == Uncertainty.ENSEMBLE:
         spec_text += """
     - `member` MUST have `standard_name` equal to `realization`.
-    - `member` SHOULD have `units` equal to `1`, the canonical units of
+    - `member` MUST have `units` equal to `1`, the canonical units of
       `realization`.
     """
     elif trait == Uncertainty.QUANTILE:

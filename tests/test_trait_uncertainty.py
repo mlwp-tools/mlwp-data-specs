@@ -81,11 +81,10 @@ def test_uncertainty_deterministic_allows_scalar_member() -> None:
     assert not report.has_fails()
 
 
-def test_uncertainty_ensemble_passes_without_warnings() -> None:
-    """Ensemble profile passes cleanly with integer, unique, attributed members."""
+def test_uncertainty_ensemble_passes() -> None:
+    """Ensemble profile passes with integer, unique, attributed members."""
     report, _ = validate_dataset(_ensemble_ds([0, 1, 2]), trait=Uncertainty.ENSEMBLE)
     assert not report.has_fails()
-    assert not report.has_warnings()
 
 
 def test_uncertainty_ensemble_fails_on_duplicate_members() -> None:
@@ -133,13 +132,12 @@ def test_uncertainty_ensemble_fails_when_member_not_leading() -> None:
     assert report.has_fails()
 
 
-def test_uncertainty_ensemble_warns_without_units() -> None:
-    """Ensemble profile only warns when member has no units."""
+def test_uncertainty_ensemble_fails_without_units() -> None:
+    """Ensemble profile fails when member has no units."""
     report, _ = validate_dataset(
         _ensemble_ds([0, 1, 2], units=None), trait=Uncertainty.ENSEMBLE
     )
-    assert not report.has_fails()
-    assert report.has_warnings()
+    assert report.has_fails()
 
 
 def test_uncertainty_quantile_passes() -> None:

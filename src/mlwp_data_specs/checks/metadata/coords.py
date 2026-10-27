@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import Literal
 
 import xarray as xr
 
@@ -34,7 +33,6 @@ def check_coordinate_attrs(
     requirement: str,
     coord: str,
     required_attrs: dict[str, set[str]],
-    failure_status: Literal["FAIL", "WARNING"] = "FAIL",
 ) -> ValidationReport:
     """Validate required attributes for one coordinate.
 
@@ -50,21 +48,16 @@ def check_coordinate_attrs(
         Coordinate name to validate.
     required_attrs : dict[str, set[str]]
         Mapping of attribute names to allowed values.
-    failure_status : {"FAIL", "WARNING"}, optional
-        Status reported when the coordinate or an attribute does not comply.
-        Use ``"WARNING"`` for recommended (SHOULD) attributes.
 
     Returns
     -------
     ValidationReport
-        Report with a PASS or ``failure_status`` result for the coordinate.
+        Report with a PASS/FAIL result for the coordinate.
     """
     report = ValidationReport()
 
     if coord not in ds.coords:
-        report.add(
-            section, requirement, failure_status, f"Coordinate '{coord}' is missing"
-        )
+        report.add(section, requirement, "FAIL", f"Coordinate '{coord}' is missing")
         return report
 
     coord_attrs = ds.coords[coord].attrs
@@ -80,9 +73,7 @@ def check_coordinate_attrs(
             )
 
     if failures:
-        report.add(
-            section, requirement, failure_status, f"{coord}: " + "; ".join(failures)
-        )
+        report.add(section, requirement, "FAIL", f"{coord}: " + "; ".join(failures))
     else:
         report.add(section, requirement, "PASS", f"{coord}: metadata is compliant")
     return report
@@ -320,17 +311,8 @@ def check_uncertainty_coordinate_metadata(
             section=section,
             requirement="Metadata for coordinate 'member'",
             coord="member",
-            required_attrs={"standard_name": {"realization"}},
+            required_attrs={"standard_name": {"realization"}, "units": {"1"}},
         )
-        if "member" in ds.coords:
-            report += check_coordinate_attrs(
-                ds,
-                section=section,
-                requirement="Recommended metadata for coordinate 'member'",
-                coord="member",
-                required_attrs={"units": {"1"}},
-                failure_status="WARNING",
-            )
         return report
 
     report += check_coordinate_attrs(
