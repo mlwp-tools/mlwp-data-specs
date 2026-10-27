@@ -203,6 +203,75 @@ def check_time_coordinate_metadata(
 
 
 @log_function_call
+def check_member_coordinate_values(ds: xr.Dataset) -> ValidationReport:
+    """Validate the structure and values of the ensemble ``member`` coordinate.
+
+    ``member`` must be one-dimensional on the ``member`` dimension, with unique
+    integer values. String labels (as earthkit-data emits by default) fail.
+
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Dataset being validated.
+
+    Returns
+    -------
+    ValidationReport
+        Report for the coordinate's shape, uniqueness and dtype. Empty when the
+        coordinate is missing, which ``check_required_coords`` reports.
+    """
+    report = ValidationReport()
+    section = "Uncertainty"
+
+    if "member" not in ds.coords:
+        return report
+
+    member = ds.coords["member"]
+    if member.dims != ("member",):
+        report.add(
+            section,
+            "Member coordinate is 1-D on 'member'",
+            "FAIL",
+            f"member has dims {member.dims}, expected ('member',)",
+        )
+        return report
+
+    index = member.to_index()
+    if index.is_unique:
+        report.add(
+            section,
+            "Member values are unique",
+            "PASS",
+            f"{index.size} unique member values",
+        )
+    else:
+        duplicates = sorted(set(index[index.duplicated()].tolist()))
+        report.add(
+            section,
+            "Member values are unique",
+            "FAIL",
+            f"Duplicate member values: {duplicates}",
+        )
+
+    if member.dtype.kind in "iu":
+        report.add(
+            section,
+            "Member values are integers",
+            "PASS",
+            f"member has integer dtype {member.dtype}",
+        )
+    else:
+        report.add(
+            section,
+            "Member values are integers",
+            "FAIL",
+            f"member has dtype {member.dtype}; expected an integer dtype",
+        )
+
+    return report
+
+
+@log_function_call
 def check_uncertainty_coordinate_metadata(
     ds: xr.Dataset,
     *,
@@ -242,7 +311,7 @@ def check_uncertainty_coordinate_metadata(
             section=section,
             requirement="Metadata for coordinate 'member'",
             coord="member",
-            required_attrs={"standard_name": {"realization"}},
+            required_attrs={"standard_name": {"realization"}, "units": {"1"}},
         )
         return report
 
@@ -251,7 +320,7 @@ def check_uncertainty_coordinate_metadata(
         section=section,
         requirement="Metadata for coordinate 'quantile'",
         coord="quantile",
-        required_attrs={"standard_name": {"quantile"}, "units": {"1"}},
+        required_attrs={"units": {"1"}},
     )
 
     if "quantile" not in ds.coords:

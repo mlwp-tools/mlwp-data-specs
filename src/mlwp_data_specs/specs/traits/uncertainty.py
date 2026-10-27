@@ -7,14 +7,19 @@ from enum import Enum
 
 import xarray as xr
 
-from mlwp_data_specs.checks.metadata.coords import check_uncertainty_coordinate_metadata
+from mlwp_data_specs.checks.metadata.coords import (
+    check_member_coordinate_values,
+    check_uncertainty_coordinate_metadata,
+)
 from mlwp_data_specs.checks.traits._common import (
     check_dim_variants,
+    check_for_forbidden_dims,
+    check_leading_dim,
     check_required_coords,
 )
 from mlwp_data_specs.specs.reporting import ValidationReport
 
-VERSION = "0.1.0"
+VERSION = "0.2.0-draft"
 IDENTIFIER = "uncertainty"
 
 
@@ -72,8 +77,12 @@ def validate_dataset(
     if trait == Uncertainty.DETERMINISTIC:
         spec_text += """
     - No uncertainty-specific dimensions are required for this profile.
+    - The dataset MUST NOT have a `member` or `quantile` dimension.
     """
         report += check_dim_variants(ds, axis="uncertainty", variants=[])
+        report += check_for_forbidden_dims(
+            ds, axis="uncertainty", forbidden_dims={"member", "quantile"}
+        )
     elif trait == Uncertainty.ENSEMBLE:
         spec_text += """
     - The dataset MUST include the `member` dimension for uncertainty realizations.
@@ -98,10 +107,17 @@ def validate_dataset(
     elif trait == Uncertainty.ENSEMBLE:
         spec_text += """
     - The dataset MUST include the `member` coordinate.
+    - `member` MUST be a one-dimensional coordinate variable on the `member`
+      dimension, with unique values of an integer dtype.
+    - The `member` values SHOULD be the producer's member identifiers rather
+      than positional indices; they need not start at 0 or be contiguous.
+    - This version of the specification does not define how a control member is
+      identified; no `member` value has a special meaning.
     """
         report += check_required_coords(
             ds, axis="uncertainty", required_coords={"member"}
         )
+        report += check_member_coordinate_values(ds)
     elif trait == Uncertainty.QUANTILE:
         spec_text += """
     - The dataset MUST include the `quantile` coordinate.
@@ -114,27 +130,56 @@ def validate_dataset(
 
     spec_text += """
     ### 3.3 Optional Coordinates
+    """
+    if trait == Uncertainty.DETERMINISTIC:
+        spec_text += """
+    - The dataset MAY include a scalar `member` coordinate identifying a single
+      member selected from an ensemble (CF §5.7).
+    """
+    else:
+        spec_text += """
+    - This profile defines no optional coordinates.
+    """
 
-    - The dataset MAY include optional coordinates for this profile: `[]`.
-
+    spec_text += """
     ### 3.4 Optional Dimensions
 
-    - The dataset MAY include optional dimensions for this profile: `[]`.
+    - This profile defines no optional dimensions.
+    """
 
+    if trait in (Uncertainty.ENSEMBLE, Uncertainty.QUANTILE):
+        uncertainty_dim = "member" if trait == Uncertainty.ENSEMBLE else "quantile"
+        spec_text += f"""
+    ### 3.5 Dimension Order
+
+    - In every data variable that has the `{uncertainty_dim}` dimension,
+      `{uncertainty_dim}` MUST be the first (leftmost) dimension, e.g.
+      `({uncertainty_dim}, reference_time, lead_time, grid_index)`, following
+      the CF §2.4 recommendation.
+    """
+        report += check_leading_dim(ds, axis="uncertainty", dim=uncertainty_dim)
+
+    spec_text += """
     ## 4. Coordinate Metadata Requirements
     """
     if trait == Uncertainty.DETERMINISTIC:
         spec_text += """
     - No uncertainty coordinate metadata is required.
+    - If the data were derived by reducing an ensemble over `member` (e.g. an
+      ensemble mean or spread), the data variables SHOULD record this in
+      `cell_methods`, e.g. `realization: mean` (CF §7.3.4). This recommendation
+      is not checked.
     """
     elif trait == Uncertainty.ENSEMBLE:
         spec_text += """
     - `member` MUST have `standard_name` equal to `realization`.
+    - `member` MUST have `units` equal to `1`, the canonical units of
+      `realization`.
     """
     elif trait == Uncertainty.QUANTILE:
         spec_text += """
-    - `quantile` MUST have `standard_name` equal to `quantile`.
     - `quantile` MUST have `units` equal to `1`.
+    - No `standard_name` is required: CF defines no standard name for quantiles.
     - All `quantile` coordinate values MUST be within `[0, 1]`.
     """
     else:
