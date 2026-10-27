@@ -68,7 +68,7 @@ def check_dim_variants(
 
 
 @log_function_call
-def check_forbidden_dims(
+def check_for_forbidden_dims(
     ds: xr.Dataset,
     *,
     axis: AxisName,

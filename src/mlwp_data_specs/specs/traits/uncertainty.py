@@ -13,7 +13,7 @@ from mlwp_data_specs.checks.metadata.coords import (
 )
 from mlwp_data_specs.checks.traits._common import (
     check_dim_variants,
-    check_forbidden_dims,
+    check_for_forbidden_dims,
     check_leading_dim,
     check_required_coords,
 )
@@ -80,7 +80,7 @@ def validate_dataset(
     - The dataset MUST NOT have a `member` or `quantile` dimension.
     """
         report += check_dim_variants(ds, axis="uncertainty", variants=[])
-        report += check_forbidden_dims(
+        report += check_for_forbidden_dims(
             ds, axis="uncertainty", forbidden_dims={"member", "quantile"}
         )
     elif trait == Uncertainty.ENSEMBLE:
@@ -148,15 +148,16 @@ def validate_dataset(
     """
 
     if trait in (Uncertainty.ENSEMBLE, Uncertainty.QUANTILE):
-        dim = "member" if trait == Uncertainty.ENSEMBLE else "quantile"
+        uncertainty_dim = "member" if trait == Uncertainty.ENSEMBLE else "quantile"
         spec_text += f"""
     ### 3.5 Dimension Order
 
-    - In every data variable that has the `{dim}` dimension, `{dim}` MUST be the
-      first (leftmost) dimension, e.g. `({dim}, reference_time, lead_time,
-      grid_index)`, following the CF §2.4 recommendation.
+    - In every data variable that has the `{uncertainty_dim}` dimension,
+      `{uncertainty_dim}` MUST be the first (leftmost) dimension, e.g.
+      `({uncertainty_dim}, reference_time, lead_time, grid_index)`, following
+      the CF §2.4 recommendation.
     """
-        report += check_leading_dim(ds, axis="uncertainty", dim=dim)
+        report += check_leading_dim(ds, axis="uncertainty", dim=uncertainty_dim)
 
     spec_text += """
     ## 4. Coordinate Metadata Requirements
