@@ -14,16 +14,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `deterministic` datasets MUST NOT have a `member` or `quantile` dimension; a
   scalar `member` coordinate (one selected member) is allowed.
 - `ensemble` datasets: `member` MUST be a one-dimensional coordinate on the
-  `member` dimension with unique values. A non-integer dtype or a missing
-  `units = "1"` is reported as a warning.
+  `member` dimension with unique integer values (string labels fail). A
+  missing `units = "1"` is reported as a warning.
+- `member` (ensemble) and `quantile` (quantile) MUST be the first dimension of
+  every data variable that has them (CF §2.4).
+- `quantile` no longer requires `standard_name = "quantile"`, which is not a CF
+  standard name; `units = "1"` and the `[0, 1]` bounds are still checked.
 
 ### Added
 
-- `check_forbidden_dims` and `check_member_coordinate_values` checks, and a
-  `failure_status` option on `check_coordinate_attrs` to report recommended
-  attributes as warnings.
-- Unchecked recommendations in the uncertainty spec text: `member`/`quantile`
-  to the left of time and spatial dimensions (CF §2.4), and `cell_methods` such
+- `check_forbidden_dims`, `check_leading_dim` and
+  `check_member_coordinate_values` checks, and a `failure_status` option on
+  `check_coordinate_attrs` to report recommended attributes as warnings.
+- Unchecked recommendation in the uncertainty spec text: `cell_methods` such
   as `realization: mean` on data reduced over an ensemble (CF §7.3.4).
 
 ## [0.1.0](https://github.com/mlwp-tools/mlwp-data-specs/releases/tag/v0.1.0)

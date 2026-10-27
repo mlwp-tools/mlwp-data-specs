@@ -14,6 +14,7 @@ from mlwp_data_specs.checks.metadata.coords import (
 from mlwp_data_specs.checks.traits._common import (
     check_dim_variants,
     check_forbidden_dims,
+    check_leading_dim,
     check_required_coords,
 )
 from mlwp_data_specs.specs.reporting import ValidationReport
@@ -107,11 +108,10 @@ def validate_dataset(
         spec_text += """
     - The dataset MUST include the `member` coordinate.
     - `member` MUST be a one-dimensional coordinate variable on the `member`
-      dimension, and its values MUST be unique.
-    - `member` SHOULD have an integer dtype. Its values SHOULD be the producer's
-      member identifiers (e.g. GRIB `perturbationNumber`, where 0 is the control
-      member) rather than positional indices; they need not start at 0 or be
-      contiguous.
+      dimension, with unique values of an integer dtype.
+    - The `member` values SHOULD be the producer's member identifiers (e.g. GRIB
+      `perturbationNumber`, where 0 is the control member) rather than positional
+      indices; they need not start at 0 or be contiguous.
     """
         report += check_required_coords(
             ds, axis="uncertainty", required_coords={"member"}
@@ -151,10 +151,11 @@ def validate_dataset(
         spec_text += f"""
     ### 3.5 Dimension Order
 
-    - The `{dim}` dimension SHOULD be placed to the left of the time and spatial
-      dimensions, e.g. `({dim}, reference_time, lead_time, grid_index)`, following
-      CF §2.4. This recommendation is not checked.
+    - In every data variable that has the `{dim}` dimension, `{dim}` MUST be the
+      first (leftmost) dimension, e.g. `({dim}, reference_time, lead_time,
+      grid_index)`, following the CF §2.4 recommendation.
     """
+        report += check_leading_dim(ds, axis="uncertainty", dim=dim)
 
     spec_text += """
     ## 4. Coordinate Metadata Requirements
@@ -175,8 +176,8 @@ def validate_dataset(
     """
     elif trait == Uncertainty.QUANTILE:
         spec_text += """
-    - `quantile` MUST have `standard_name` equal to `quantile`.
     - `quantile` MUST have `units` equal to `1`.
+    - No `standard_name` is required: CF defines no standard name for quantiles.
     - All `quantile` coordinate values MUST be within `[0, 1]`.
     """
     else:

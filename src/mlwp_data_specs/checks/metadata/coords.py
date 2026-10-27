@@ -215,9 +215,8 @@ def check_time_coordinate_metadata(
 def check_member_coordinate_values(ds: xr.Dataset) -> ValidationReport:
     """Validate the structure and values of the ensemble ``member`` coordinate.
 
-    ``member`` must be one-dimensional on the ``member`` dimension and its
-    values must be unique. A non-integer dtype (e.g. the string labels that
-    earthkit-data emits by default) is reported as a warning.
+    ``member`` must be one-dimensional on the ``member`` dimension, with unique
+    integer values. String labels (as earthkit-data emits by default) fail.
 
     Parameters
     ----------
@@ -265,14 +264,17 @@ def check_member_coordinate_values(ds: xr.Dataset) -> ValidationReport:
 
     if member.dtype.kind in "iu":
         report.add(
-            section, "Member dtype", "PASS", f"member has integer dtype {member.dtype}"
+            section,
+            "Member values are integers",
+            "PASS",
+            f"member has integer dtype {member.dtype}",
         )
     else:
         report.add(
             section,
-            "Member dtype",
-            "WARNING",
-            f"member has dtype {member.dtype}; integer member identifiers are recommended",
+            "Member values are integers",
+            "FAIL",
+            f"member has dtype {member.dtype}; expected an integer dtype",
         )
 
     return report
@@ -336,7 +338,7 @@ def check_uncertainty_coordinate_metadata(
         section=section,
         requirement="Metadata for coordinate 'quantile'",
         coord="quantile",
-        required_attrs={"standard_name": {"quantile"}, "units": {"1"}},
+        required_attrs={"units": {"1"}},
     )
 
     if "quantile" not in ds.coords:
