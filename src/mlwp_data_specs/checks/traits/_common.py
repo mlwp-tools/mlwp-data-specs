@@ -68,6 +68,50 @@ def check_dim_variants(
 
 
 @log_function_call
+def check_forbidden_dims(
+    ds: xr.Dataset,
+    *,
+    axis: AxisName,
+    forbidden_dims: set[str],
+) -> ValidationReport:
+    """Validate that the dataset has none of the given dimensions.
+
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Dataset being validated.
+    axis : AxisName
+        Trait axis key.
+    forbidden_dims : set[str]
+        Dimension names that the trait profile does not allow.
+
+    Returns
+    -------
+    ValidationReport
+        Report containing one PASS or FAIL result.
+    """
+    report = ValidationReport()
+    requirement = "Forbidden dimensions are absent"
+
+    present = forbidden_dims & set(ds.dims)
+    if present:
+        report.add(
+            SECTION_MAP[axis],
+            requirement,
+            "FAIL",
+            f"Dataset has dimensions not allowed for this profile: {sorted(present)}",
+        )
+    else:
+        report.add(
+            SECTION_MAP[axis],
+            requirement,
+            "PASS",
+            f"None of {sorted(forbidden_dims)} is a dimension",
+        )
+    return report
+
+
+@log_function_call
 def check_required_coords(
     ds: xr.Dataset,
     *,

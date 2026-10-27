@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from typing import Literal
 
 import xarray as xr
 
@@ -33,6 +34,7 @@ def check_coordinate_attrs(
     requirement: str,
     coord: str,
     required_attrs: dict[str, set[str]],
+    failure_status: Literal["FAIL", "WARNING"] = "FAIL",
 ) -> ValidationReport:
     """Validate required attributes for one coordinate.
 
@@ -48,16 +50,21 @@ def check_coordinate_attrs(
         Coordinate name to validate.
     required_attrs : dict[str, set[str]]
         Mapping of attribute names to allowed values.
+    failure_status : {"FAIL", "WARNING"}, optional
+        Status reported when the coordinate or an attribute does not comply.
+        Use ``"WARNING"`` for recommended (SHOULD) attributes.
 
     Returns
     -------
     ValidationReport
-        Report with a PASS/FAIL result for the coordinate.
+        Report with a PASS or ``failure_status`` result for the coordinate.
     """
     report = ValidationReport()
 
     if coord not in ds.coords:
-        report.add(section, requirement, "FAIL", f"Coordinate '{coord}' is missing")
+        report.add(
+            section, requirement, failure_status, f"Coordinate '{coord}' is missing"
+        )
         return report
 
     coord_attrs = ds.coords[coord].attrs
@@ -73,7 +80,9 @@ def check_coordinate_attrs(
             )
 
     if failures:
-        report.add(section, requirement, "FAIL", f"{coord}: " + "; ".join(failures))
+        report.add(
+            section, requirement, failure_status, f"{coord}: " + "; ".join(failures)
+        )
     else:
         report.add(section, requirement, "PASS", f"{coord}: metadata is compliant")
     return report
@@ -203,6 +212,73 @@ def check_time_coordinate_metadata(
 
 
 @log_function_call
+def check_member_coordinate_values(ds: xr.Dataset) -> ValidationReport:
+    """Validate the structure and values of the ensemble ``member`` coordinate.
+
+    ``member`` must be one-dimensional on the ``member`` dimension and its
+    values must be unique. A non-integer dtype (e.g. the string labels that
+    earthkit-data emits by default) is reported as a warning.
+
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Dataset being validated.
+
+    Returns
+    -------
+    ValidationReport
+        Report for the coordinate's shape, uniqueness and dtype. Empty when the
+        coordinate is missing, which ``check_required_coords`` reports.
+    """
+    report = ValidationReport()
+    section = "Uncertainty"
+
+    if "member" not in ds.coords:
+        return report
+
+    member = ds.coords["member"]
+    if member.dims != ("member",):
+        report.add(
+            section,
+            "Member coordinate is 1-D on 'member'",
+            "FAIL",
+            f"member has dims {member.dims}, expected ('member',)",
+        )
+        return report
+
+    index = member.to_index()
+    if index.is_unique:
+        report.add(
+            section,
+            "Member values are unique",
+            "PASS",
+            f"{index.size} unique member values",
+        )
+    else:
+        duplicates = sorted(set(index[index.duplicated()].tolist()))
+        report.add(
+            section,
+            "Member values are unique",
+            "FAIL",
+            f"Duplicate member values: {duplicates}",
+        )
+
+    if member.dtype.kind in "iu":
+        report.add(
+            section, "Member dtype", "PASS", f"member has integer dtype {member.dtype}"
+        )
+    else:
+        report.add(
+            section,
+            "Member dtype",
+            "WARNING",
+            f"member has dtype {member.dtype}; integer member identifiers are recommended",
+        )
+
+    return report
+
+
+@log_function_call
 def check_uncertainty_coordinate_metadata(
     ds: xr.Dataset,
     *,
@@ -244,6 +320,15 @@ def check_uncertainty_coordinate_metadata(
             coord="member",
             required_attrs={"standard_name": {"realization"}},
         )
+        if "member" in ds.coords:
+            report += check_coordinate_attrs(
+                ds,
+                section=section,
+                requirement="Recommended metadata for coordinate 'member'",
+                coord="member",
+                required_attrs={"units": {"1"}},
+                failure_status="WARNING",
+            )
         return report
 
     report += check_coordinate_attrs(
