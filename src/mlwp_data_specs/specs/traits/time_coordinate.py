@@ -9,13 +9,18 @@ import xarray as xr
 from mlwp_data_specs.checks.coords.dimensions import check_dim_variants
 from mlwp_data_specs.checks.coords.names import check_required_coords
 from mlwp_data_specs.checks.coords.temporal import check_time_coordinate_metadata
+from mlwp_data_specs.checks.global_attributes.traits import (
+    TRAIT_ATTR_FORMAT,
+    check_trait_attribute,
+)
 from mlwp_data_specs.specs.reporting import ValidationReport
 from mlwp_data_specs.trait_profiles import Time
 
-__all__ = ["IDENTIFIER", "VERSION", "Time", "validate_dataset"]
+__all__ = ["IDENTIFIER", "TIME_TRAIT_ATTR", "VERSION", "Time", "validate_dataset"]
 
-VERSION = "0.1.0"
+VERSION = "0.1.1-draft"
 IDENTIFIER = "time_coordinate"
+TIME_TRAIT_ATTR = TRAIT_ATTR_FORMAT.format("time")
 
 
 def validate_dataset(
@@ -130,5 +135,20 @@ def validate_dataset(
         raise NotImplementedError(f"Unsupported time trait: {trait!r}")
 
     report += check_time_coordinate_metadata(ds, trait=trait)
+
+    allowed = ", ".join(f"`{profile}`" for profile in Time)
+    spec_text += f"""
+    ## 5. Global Attributes
+
+    - The dataset MAY include the global attribute `{TIME_TRAIT_ATTR}` to declare its
+      time trait profile.
+    - If present, `{TIME_TRAIT_ATTR}` MUST be one of: {allowed}.
+    - If present, `{TIME_TRAIT_ATTR}` SHOULD equal `{trait}`, the profile being
+      validated.
+    - The requirement on the value of `{TIME_TRAIT_ATTR}` applies to any dataset
+      that carries the attribute, including datasets validated only against other
+      traits.
+    """
+    report += check_trait_attribute(ds, trait_axis="time", trait_cls=Time, trait=trait)
 
     return report, textwrap.dedent(spec_text)

@@ -72,12 +72,14 @@ src/mlwp_data_specs/
 │       ├── time_coordinate.py     # Time trait specs + validation wiring
 │       └── uncertainty.py         # Uncertainty trait specs + validation wiring
 ├── checks/                        # Subpackages mirror xr.Dataset components
-│   └── coords/
-│       ├── dimensions.py          # Allowed dimension variants
-│       ├── names.py               # Required coordinates and coordinate attributes
-│       ├── spatial.py             # Spatial coordinate metadata
-│       ├── temporal.py            # Time coordinate metadata
-│       └── uncertainty.py         # Uncertainty coordinate metadata
+│   ├── coords/
+│   │   ├── dimensions.py          # Allowed dimension variants
+│   │   ├── names.py               # Required coordinates and coordinate attributes
+│   │   ├── spatial.py             # Spatial coordinate metadata
+│   │   ├── temporal.py            # Time coordinate metadata
+│   │   └── uncertainty.py         # Uncertainty coordinate metadata
+│   └── global_attributes/
+│       └── traits.py              # Optional mlwp_*_trait profile declarations
 ```
 
 ## Requirements

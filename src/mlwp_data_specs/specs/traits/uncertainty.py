@@ -11,13 +11,24 @@ from mlwp_data_specs.checks.coords.names import check_required_coords
 from mlwp_data_specs.checks.coords.uncertainty import (
     check_uncertainty_coordinate_metadata,
 )
+from mlwp_data_specs.checks.global_attributes.traits import (
+    TRAIT_ATTR_FORMAT,
+    check_trait_attribute,
+)
 from mlwp_data_specs.specs.reporting import ValidationReport
 from mlwp_data_specs.trait_profiles import Uncertainty
 
-__all__ = ["IDENTIFIER", "VERSION", "Uncertainty", "validate_dataset"]
+__all__ = [
+    "IDENTIFIER",
+    "UNCERTAINTY_TRAIT_ATTR",
+    "VERSION",
+    "Uncertainty",
+    "validate_dataset",
+]
 
-VERSION = "0.1.0"
+VERSION = "0.1.1-draft"
 IDENTIFIER = "uncertainty"
+UNCERTAINTY_TRAIT_ATTR = TRAIT_ATTR_FORMAT.format("uncertainty")
 
 
 def validate_dataset(
@@ -141,5 +152,22 @@ def validate_dataset(
         raise NotImplementedError(f"Unsupported uncertainty trait: {trait!r}")
 
     report += check_uncertainty_coordinate_metadata(ds, trait=trait)
+
+    allowed = ", ".join(f"`{profile}`" for profile in Uncertainty)
+    spec_text += f"""
+    ## 5. Global Attributes
+
+    - The dataset MAY include the global attribute `{UNCERTAINTY_TRAIT_ATTR}` to
+      declare its uncertainty trait profile.
+    - If present, `{UNCERTAINTY_TRAIT_ATTR}` MUST be one of: {allowed}.
+    - If present, `{UNCERTAINTY_TRAIT_ATTR}` SHOULD equal `{trait}`, the
+      profile being validated.
+    - The requirement on the value of `{UNCERTAINTY_TRAIT_ATTR}` applies to any
+      dataset that carries the attribute, including datasets validated only
+      against other traits.
+    """
+    report += check_trait_attribute(
+        ds, trait_axis="uncertainty", trait_cls=Uncertainty, trait=trait
+    )
 
     return report, textwrap.dedent(spec_text)

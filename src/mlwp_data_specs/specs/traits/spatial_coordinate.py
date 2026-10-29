@@ -9,13 +9,18 @@ import xarray as xr
 from mlwp_data_specs.checks.coords.dimensions import check_dim_variants
 from mlwp_data_specs.checks.coords.names import check_required_coords
 from mlwp_data_specs.checks.coords.spatial import check_space_coordinate_metadata
+from mlwp_data_specs.checks.global_attributes.traits import (
+    TRAIT_ATTR_FORMAT,
+    check_trait_attribute,
+)
 from mlwp_data_specs.specs.reporting import ValidationReport
 from mlwp_data_specs.trait_profiles import Space
 
-__all__ = ["IDENTIFIER", "VERSION", "Space", "validate_dataset"]
+__all__ = ["IDENTIFIER", "SPACE_TRAIT_ATTR", "VERSION", "Space", "validate_dataset"]
 
 VERSION = "0.1.1-draft"
 IDENTIFIER = "spatial_coordinate"
+SPACE_TRAIT_ATTR = TRAIT_ATTR_FORMAT.format("space")
 
 
 def validate_dataset(
@@ -135,5 +140,22 @@ def validate_dataset(
     """
 
     report += check_space_coordinate_metadata(ds, trait=trait)
+
+    allowed = ", ".join(f"`{profile}`" for profile in Space)
+    spec_text += f"""
+    ## 5. Global Attributes
+
+    - The dataset MAY include the global attribute `{SPACE_TRAIT_ATTR}` to declare its
+      spatial trait profile.
+    - If present, `{SPACE_TRAIT_ATTR}` MUST be one of: {allowed}.
+    - If present, `{SPACE_TRAIT_ATTR}` SHOULD equal `{trait}`, the profile being
+      validated.
+    - The requirement on the value of `{SPACE_TRAIT_ATTR}` applies to any dataset
+      that carries the attribute, including datasets validated only against other
+      traits.
+    """
+    report += check_trait_attribute(
+        ds, trait_axis="space", trait_cls=Space, trait=trait
+    )
 
     return report, textwrap.dedent(spec_text)

@@ -5,23 +5,40 @@ from __future__ import annotations
 import xarray as xr
 from loguru import logger
 
+from mlwp_data_specs.checks.global_attributes.traits import (
+    TRAIT_ATTR_FORMAT,
+    check_trait_attribute,
+)
 from mlwp_data_specs.specs.reporting import ValidationReport
+from mlwp_data_specs.specs.traits.spatial_coordinate import (
+    SPACE_TRAIT_ATTR,
+)
 from mlwp_data_specs.specs.traits.spatial_coordinate import (
     validate_dataset as validate_space,
 )
 from mlwp_data_specs.specs.traits.time_coordinate import (
+    TIME_TRAIT_ATTR,
+)
+from mlwp_data_specs.specs.traits.time_coordinate import (
     validate_dataset as validate_time,
+)
+from mlwp_data_specs.specs.traits.uncertainty import (
+    UNCERTAINTY_TRAIT_ATTR,
 )
 from mlwp_data_specs.specs.traits.uncertainty import (
     validate_dataset as validate_uncertainty,
 )
 from mlwp_data_specs.trait_profiles import Space, StrEnumLike, Time, Uncertainty
 
-_TRAIT_ATTR_FORMAT = "mlwp_{}_trait"
-
-TIME_TRAIT_ATTR = _TRAIT_ATTR_FORMAT.format("time")
-SPACE_TRAIT_ATTR = _TRAIT_ATTR_FORMAT.format("space")
-UNCERTAINTY_TRAIT_ATTR = _TRAIT_ATTR_FORMAT.format("uncertainty")
+__all__ = [
+    "SPACE_TRAIT_ATTR",
+    "TIME_TRAIT_ATTR",
+    "UNCERTAINTY_TRAIT_ATTR",
+    "Space",
+    "Time",
+    "Uncertainty",
+    "validate_dataset",
+]
 
 
 def _check_trait_value(
@@ -78,7 +95,7 @@ def _resolve_trait(
         The resolved trait value or ``None``.
     """
     trait_name = profiles_cls.__name__.lower()
-    attr_name = _TRAIT_ATTR_FORMAT.format(trait_name)
+    attr_name = TRAIT_ATTR_FORMAT.format(trait_name)
 
     arg_trait = _check_trait_value(arg_value, profiles_cls, trait_name)
     attr_value = ds.attrs.get(attr_name)
@@ -118,6 +135,9 @@ def validate_dataset(
     will attempt to resolve it from the dataset's attributes (e.g.,
     ``mlwp_time_trait``, ``mlwp_space_trait``, ``mlwp_uncertainty_trait``).
     If both are provided and differ, the argument takes precedence.
+
+    A trait attribute that is present is always checked, even for traits that
+    are not validated, so an invalid value is reported as a failure.
 
     Parameters
     ----------
@@ -163,5 +183,17 @@ def validate_dataset(
     if uncertainty_trait is not None:
         trait_report, _ = validate_uncertainty(ds, trait=uncertainty_trait)
         report += trait_report
+
+    # trait specs check their own attribute; check the rest for validity only
+    unvalidated = [
+        ("time", Time, time_trait, TIME_TRAIT_ATTR),
+        ("space", Space, space_trait, SPACE_TRAIT_ATTR),
+        ("uncertainty", Uncertainty, uncertainty_trait, UNCERTAINTY_TRAIT_ATTR),
+    ]
+    for trait_axis, trait_cls, trait, attr_name in unvalidated:
+        if trait is None and attr_name in ds.attrs:
+            report += check_trait_attribute(
+                ds, trait_axis=trait_axis, trait_cls=trait_cls
+            )
 
     return report

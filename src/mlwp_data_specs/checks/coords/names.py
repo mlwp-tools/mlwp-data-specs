@@ -6,7 +6,7 @@ from collections.abc import Iterable
 
 import xarray as xr
 
-from mlwp_data_specs.checks.coords import SECTION_MAP, TraitAxis
+from mlwp_data_specs.checks import SECTION_MAP, TraitAxis
 from mlwp_data_specs.specs.reporting import ValidationReport, log_function_call
 
 
